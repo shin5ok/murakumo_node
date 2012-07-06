@@ -1,0 +1,10 @@
+    <interface type='bridge' name='[% bridge -%]'>
+      <bridge>
+        <interface type='vlan' name='[% vlan_nic -%]'>
+          <vlan tag='[% vlan_id -%]'>
+            <interface name='[% nic -%]'/>
+          </vlan>
+        </interface>
+      </bridge>
+    </interface>
+

@@ -1,0 +1,11 @@
+    <interface type='bridge'>
+      <mac address='[% mac -%]'/>
+      <source bridge='[% bridge -%]'/>
+      <model type='[% driver -%]'/>
+[% IF ip -%]
+      <filterref filter='clean-traffic'>       
+        <parameter name='IP' value='[% ip -%]'/>
+      </filterref> 
+[% END -%]
+    </interface>
+

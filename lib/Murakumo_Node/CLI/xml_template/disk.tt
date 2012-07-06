@@ -1,0 +1,5 @@
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw' cache='writeback'/>
+      <source file='[% image_path -%]'/>
+      <target dev='[% devname -%]' bus='[% driver -%]'/>
+    </disk>

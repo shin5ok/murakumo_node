@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<domain type="kvm">
+  <name>[% name -%]</name>
+  <uuid>[% uuid -%]</uuid>
+  <memory>[% memory -%]</memory>
+  <currentMemory>[% memory -%]</currentMemory>
+  <vcpu>[% cpu -%]</vcpu>
+  <os>
+    <type arch="x86_64" machine="rhel6.2.0">hvm</type>
+    <boot dev="cdrom"/>
+    <boot dev="hd"/>
+    <bootmenu enable="no"/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+  </features>
+  <clock offset="[% clock -%]"/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type="file" device="cdrom">
+      <driver name="qemu" type="raw"/>
+      [% IF cdrom_path -%]
+      <source file='[% cdrom_path -%]'/>    
+      [% END -%]
+      <target dev="hdc" bus="ide"/>
+      <readonly/>
+      <address type='drive' controller='0' bus='0' unit='0'/>
+    </disk>
+[% FOREACH disk = disks -%]
+[% disk -%]
+[% END -%]
+    <controller type="ide" index="0">
+    </controller>
+[% FOREACH interface = interfaces -%]
+[% interface -%]
+[% END -%]
+    <serial type="pty">
+      <target port="0"/>
+    </serial>
+    <console type="pty">
+      <target type="serial" port="0"/>
+    </console>
+    <input type="mouse" bus="ps2"/>
+    <graphics type="vnc" port="-1" autoport="yes" listen="0.0.0.0" keymap="ja" passwd="[% vnc_password -%]"/>
+    <video>
+      <model type="cirrus" vram="9216" heads="1"/>
+    </video>
+    <memballoon model="virtio">
+    </memballoon>
+  </devices>
+</domain>
