@@ -138,6 +138,7 @@ sub create :Local {
   my $job_model = $c->model('Job');
 
   my $r = $job_model->register('VPS::Disk::Create', $params);
+  warn $r;
   if ($r) {
     $c->stash->{result} = 1;
   };

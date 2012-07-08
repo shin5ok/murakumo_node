@@ -12,9 +12,12 @@ use Storable;
   no warnings;
   $Storable::Deparse = 1;
 }
+use lib qw(/home/smc/murakumo_node/lib);
+use Murakumo_Node::CLI::Utils;
 
-# このへん後日設定ファイルにする
-our $dbpath  = '/home/smc/Murakumo_Node/lib/Murakumo_Node/CLI/job.db';
+my $config   = Murakumo_Node::CLI::Utils->config;
+
+our $dbpath  = $config->{job_db_path};
 our $dbparam = {
        dsn => 'dbi:SQLite:dbname=' . $dbpath,
     };
