@@ -13,7 +13,7 @@ use IPC::Open2;
 
 our $VERSION = q(0.0.3);
 
-our $config_path   = q{/home/smc/murakumo_node/Murakumo_Node.conf};
+our $config_path   = q{/home/smc/murakumo_node/murakumo_node.conf};
 our $root_itemname = q{root};
 
 sub import {
