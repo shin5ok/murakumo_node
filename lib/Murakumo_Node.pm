@@ -69,7 +69,7 @@ L<Murakumo_Node::Controller::Root>, L<Catalyst>
 
 =head1 AUTHOR
 
-kawano
+shin5ok
 
 =head1 LICENSE
 

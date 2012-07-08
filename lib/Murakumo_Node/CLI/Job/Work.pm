@@ -20,9 +20,6 @@ our $class_dir_path = sprintf "%s::", __PACKAGE__;
 our %works;
 our $config = Murakumo_Node::CLI::Utils->new->config;
 our $default_callback_uri = $config->{job_callback_uri};
-##########################################################################
-# our $default_callback_uri = 'http://192.168.232.29:3000/job/update/';
-##########################################################################
 
 
 BEGIN {
@@ -78,9 +75,10 @@ our $global_func = sub {
   # sample function
   my ($args) = @_;
   no strict 'refs';
-  open my $p, "| /usr/sbin/sendmail -fkawano\@mcnet.ne.jp -t";
+  my $to = $config->{test_to} || "root";
+  open my $p, "| /usr/sbin/sendmail -t";
   print {$p} "Subject: $args->{subject}\n";
-  print {$p} "To: kawano\@mcnet.ad.jp\n";
+  print {$p} "To: $to\n";
   print {$p} "\n";
   print {$p} "$args->{message}\n";
   close $p;

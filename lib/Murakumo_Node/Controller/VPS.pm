@@ -231,7 +231,7 @@ sub clone :Local {
 
 =head1 AUTHOR
 
-kawano
+shin5ok
 
 =head1 LICENSE
 

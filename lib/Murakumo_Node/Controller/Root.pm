@@ -107,7 +107,7 @@ Attempt to render a view, if needed.
 
 =head1 AUTHOR
 
-kawano
+shin5ok
 
 =head1 LICENSE
 

@@ -17,7 +17,7 @@ Catalyst JSON View.
 
 =head1 AUTHOR
 
-kawano
+shin5ok
 
 =head1 LICENSE
 
