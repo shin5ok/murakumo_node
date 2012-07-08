@@ -8,7 +8,8 @@ use HTTP::Request::Common qw( GET POST );
 use URI;
 use JSON;
 use Data::Dumper;
-use lib qw(/home/smc/Murakumo_Node/lib);
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
 
 our $config = Murakumo_Node::CLI::Utils->config;

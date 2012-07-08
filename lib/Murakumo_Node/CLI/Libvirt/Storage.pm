@@ -2,7 +2,8 @@ use warnings;
 use strict;
 
 package Murakumo_Node::CLI::Libvirt::Storage 0.02;
-use lib qw( /home/smc/Murakumo_Node/lib );
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
 use Murakumo_Node::CLI::Libvirt;
 use Carp;

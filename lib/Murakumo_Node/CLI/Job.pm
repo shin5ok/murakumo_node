@@ -12,7 +12,8 @@ use Storable;
   no warnings;
   $Storable::Deparse = 1;
 }
-use lib qw(/home/smc/murakumo_node/lib);
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
 
 my $config   = Murakumo_Node::CLI::Utils->config;

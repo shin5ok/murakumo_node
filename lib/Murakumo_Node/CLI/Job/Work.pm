@@ -10,7 +10,8 @@ use Data::Dumper;
 use LWP::UserAgent;
 use HTTP::Request::Common qw( POST );
 
-use lib qw(/home/smc/Murakumo_Node/lib);
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
 
 our $VERSION = q(0.0.1);

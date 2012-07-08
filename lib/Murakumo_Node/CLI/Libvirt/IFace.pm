@@ -9,7 +9,8 @@ use Path::Class;
 use IPC::Cmd;
 use Data::Dumper;
 
-use lib qw( /home/smc/Murakumo_Node/lib );
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
 use Murakumo_Node::CLI::Libvirt;
 use base q(Murakumo_Node::CLI::Libvirt);

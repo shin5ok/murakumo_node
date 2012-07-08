@@ -3,7 +3,8 @@ use warnings;
 package Murakumo_Node::CLI::Job::Work::VPS::Clone;
 use Carp;
 
-use lib qw(/home/smc/Murakumo_Node/lib);
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::VPS::Disk;
 
 # boot部分を作る
