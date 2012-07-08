@@ -1,6 +1,6 @@
 #!/home/smc/bin/perl
 # chkconfig: 35 99 10
-# description: smc vps2 node api
+# description: murakumo_node api
 #
 
 use strict;
@@ -13,13 +13,13 @@ my $arg = shift || _usage();
 $> == 0
   or croak "*** not root user";
 
-my $pid = "/var/tmp/smc_vps2_node.pid";
+my $pid = "/var/run/murakumo_node.pid";
 
 if ($arg eq 'start') {
-  printf "nagios api start...%s\n", _start() ? "ok" : "FAIL";
+  printf "murakumo_node api start...%s\n", _start() ? "ok" : "FAIL";
 }
 elsif ($arg eq 'stop') {
-  printf "nagios api stop...%s\n",  _stop()  ? "ok" : "FAIL";
+  printf "murakumo_node api stop...%s\n",  _stop()  ? "ok" : "FAIL";
 
 }
 elsif ($arg eq 'restart') {
@@ -28,7 +28,7 @@ elsif ($arg eq 'restart') {
 
 }
 elsif ($arg eq 'reload') {
-  printf "nagios api reload...%s\n", _reload() ? "ok" : "FAIL";
+  printf "murakumo_node api reload...%s\n", _reload() ? "ok" : "FAIL";
 
 } else {
   _usage();
@@ -36,8 +36,8 @@ elsif ($arg eq 'reload') {
 }
 
 sub _start {
-  chdir "/home/smc/Murakumo_Node/script";
-  my $r = system "/home/smc/bin/perl smc_vps2_node_server.pl --background --pidfile $pid > /dev/null 2>&1";
+  chdir "/home/smc/murakumo_node/script";
+  my $r = system "/home/smc/bin/perl Murakumo_Node_server.pl --background --pidfile $pid > /dev/null 2>&1";
   return $r == 0;
 }
 

@@ -1,6 +1,6 @@
 #!/home/smc/bin/perl
 # chkconfig: - 99 10
-# description: smc_vps2 for node submit my condition
+# description: murakumo_node for node submit my condition
 
 use strict;
 use warnings;

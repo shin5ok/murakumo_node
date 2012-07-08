@@ -4,8 +4,6 @@ use strict;
 package Murakumo_Node::CLI::Libvirt::XML;
 use lib qw( /home/smc/Murakumo_Node/lib );
 use Murakumo_Node::CLI::Utils;
-# use Murakumo_Node::CLI::Libvirt;
-# use base q(Murakumo_Node::CLI::Libvirt);
 
 use Carp;
 use Data::Dumper;
@@ -16,12 +14,17 @@ use Template;
 our $VERSION = q(0.0.1);
 
 sub new {
-  my $class = shift;
-  my $tt    = Template->new( ABSOLUTE => 1 );
-  my $obj   = bless {
-                tt     => $tt,
-                config => Murakumo_Node::CLI::Utils->new->config,
-              }, $class;
+  my $class  = shift;
+  my $tt     = Template->new( ABSOLUTE => 1 );
+  my $config = Murakumo_Node::CLI::Utils->new->config,
+  my $obj    = bless {
+                 tt     => $tt,
+                 config => $config,
+               }, $class;
+
+  $obj->{xml_template_dir_path} = sprintf "%s/%s",              
+                                          $config->{module_root},
+                                          $config->{template_dir_path};
   return $obj;
 }
 
@@ -35,7 +38,7 @@ sub create_interface_xml {
   # [% driver -%]
   # [% ip -%]
   my $config  = $self->{config};
-  my $tt_path = sprintf "%s/%s", $config->{xml_template_dir_path}, $config->{nw_xml_template_name};
+  my $tt_path = sprintf "%s/%s", $self->{xml_template_dir_path}, $config->{nw_xml_template_name};
   -f $tt_path
     or croak "*** $tt_path is not found";
 
@@ -55,7 +58,7 @@ sub create_disk_xml {
   # [% devname -%]
   # [% driver -%]
   my $config  = $self->{config};
-  my $tt_path = sprintf "%s/%s", $config->{xml_template_dir_path}, $config->{disk_xml_template_name};
+  my $tt_path = sprintf "%s/%s", $self->{xml_template_dir_path}, $config->{disk_xml_template_name};
   -f $tt_path
     or croak "*** $tt_path is not found";
 
@@ -85,7 +88,7 @@ sub create_vps_xml {
   $p->{interfaces} = $if_array_ref;
 
   my $config  = $self->{config};
-  my $tt_path = sprintf "%s/%s", $config->{xml_template_dir_path}, $config->{vps_xml_template_name};
+  my $tt_path = sprintf "%s/%s", $self->{xml_template_dir_path}, $config->{vps_xml_template_name};
   -f $tt_path
     or croak "*** $tt_path is not found";
 
@@ -101,7 +104,7 @@ sub create_storage_xml {
 
   my $config  = $self->{config};
 
-  my $tt_path = sprintf "%s/%s", $config->{xml_template_dir_path}, $config->{storage_xml_template_name};
+  my $tt_path = sprintf "%s/%s", $self->{xml_template_dir_path}, $config->{storage_xml_template_name};
   -f $tt_path
     or croak "*** $tt_path is not found";
 
@@ -129,7 +132,7 @@ sub create_iface_for_libvirt {
   # </interface>
 
   my $config  = $self->{config};
-  my $tt_path = sprintf "%s/%s", $config->{xml_template_dir_path}, $config->{iface_xml_template_name};
+  my $tt_path = sprintf "%s/%s", $self->{xml_template_dir_path}, $config->{iface_xml_template_name};
   -f $tt_path
     or croak "*** $tt_path is not found";
 
