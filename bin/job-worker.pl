@@ -13,9 +13,11 @@ use Storable;
   $Storable::Eval= 1;
 }
 
-use lib qw(/home/smc/Murakumo_Node/lib);
+use lib qw(/home/smc/murakumo_node/lib);
 use Murakumo_Node::CLI::Job;
+use Murakumo_Node::CLI::Utils;
 
+my $config   = Murakumo_Node::CLI::Utils->config;
 my $progname = basename __FILE__;
 newdaemon(
   progname   => $progname,
@@ -26,7 +28,7 @@ sub gd_preconfig {}
 
 sub gd_run {
 
-  my $dbpath = q(/home/smc/Murakumo_Node/lib/Murakumo_Node/CLI/job.db);
+  my $dbpath = $config->{job_db_path};
   
   my $c = TheSchwartz->new( databases => [ +{ dsn => 'dbi:SQLite:dbname='. $dbpath, } ], verbose => 0, );
   
