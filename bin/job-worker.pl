@@ -1,4 +1,6 @@
-#!/home/smc/bin/perl
+#!/usr/bin/env perl
+# chkconfig: 35 99 10
+# description: murakumo_node job
 use strict;
 use warnings;
 
