@@ -6,8 +6,6 @@ use Data::Dumper;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
-use Murakumo_Node::CLI::VPS::Disk;
-
 
 # boot部分を作る
 sub work {
@@ -21,6 +19,7 @@ sub work {
 
   local $@;
   eval {
+    require Murakumo_Node::CLI::VPS::Disk;
     my $vps_obj = Murakumo_Node::CLI::VPS::Disk->new;
 
     # disk_ref = [ "/vm/111/uuid.img", "/vm/111/uuid-01.img" ];
@@ -28,9 +27,7 @@ sub work {
   };
   if (! $r or $@ ) {
     local $Data::Dumper::Terse = 1;
-    my $log = sprintf "remove failed by %s", Dumper \%args;
-    $log .= "($@)";
-    $log =~ s/\n/ /g;
+    my $log = sprintf "remove failed by %s(%s)", Dumper \%args, $@;
     return $job->failed($log);
   }
 

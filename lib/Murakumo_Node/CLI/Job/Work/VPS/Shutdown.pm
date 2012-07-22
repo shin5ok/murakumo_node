@@ -5,7 +5,6 @@ use Carp;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
-use Murakumo_Node::CLI::VPS;
 
 my $method = 'shutdown';
 
@@ -27,13 +26,12 @@ sub work {
   my $r;
   local $@;
   eval {
+    require Murakumo_Node::CLI::VPS;
     my $vps_obj = Murakumo_Node::CLI::VPS->new( \%ids ); 
     $r = $vps_obj->$method;
   };
   if (! $r or $@ ) {
-    my $log = "uuid: $uuid, $id: $id => $method failed";
-    $log .= "($@)";
-    $log =~ s/\n/ /g;
+    my $log = sprintf "uuid: %s, $id: %s => $method failed(%s)", $uuid, $id, $@;
     return $job->failed($log);
   }
 

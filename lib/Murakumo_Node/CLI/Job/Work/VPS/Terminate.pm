@@ -2,20 +2,16 @@ use strict;
 use warnings;
 package Murakumo_Node::CLI::Job::Work::VPS::Terminate;
 use Carp;
+use Data::Dumper;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
-use Murakumo_Node::CLI::VPS;
 
 my $method = 'terminate';
 
 sub work {
   my ($self, $job) = @_;
 
-  use Data::Dumper;
-  warn "------------------";
-  warn Dumper $job->arg;
-  warn "------------------";
   my ($id, $uuid);
   {
     no strict 'refs';
@@ -31,13 +27,13 @@ sub work {
   my $r;
   local $@;
   eval {
+    require Murakumo_Node::CLI::VPS;
     my $vps_obj = Murakumo_Node::CLI::VPS->new( \%ids ); 
     $r = $vps_obj->$method;
+
   };
   if (! $r or $@ ) {
-    my $log = "uuid: $uuid, $id: $id => $method failed";
-    $log .= "($@)";
-    $log =~ s/\n/ /g;
+    my $log = sprintf "uuid: %s, $id: %s => %s failed", $uuid, $id, $method;
     return $job->failed($log);
   }
 

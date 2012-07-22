@@ -6,7 +6,6 @@ use Data::Dumper;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
-use Murakumo_Node::CLI::VPS::Disk;
 
 # boot部分を作る
 sub work {
@@ -20,20 +19,14 @@ sub work {
 
   local $@;
   eval {
+    require Murakumo_Node::CLI::VPS::Disk;
     my $vps_obj = Murakumo_Node::CLI::VPS::Disk->new;
-
-    # disk_param_ref = [
-    #                    { path : "/vm/111/uuid.img",    size: 10240 },
-    #                    { path : "/vm/111/uuid-01.img", size: 20480 },
-    #                  ];
 
     $r = $vps_obj->create( \%args );
   };
   if (! $r or $@ ) {
     local $Data::Dumper::Terse = 1;
-    my $log = sprintf "create failed by %s", Dumper \%args;
-    $log .= "($@)";
-    $log =~ s/\n/ /g;
+    my $log = sprintf "create failed by %s(%s)", Dumper \%args, $@;
     return $job->failed($log);
   }
 

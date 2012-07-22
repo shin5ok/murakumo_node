@@ -5,29 +5,26 @@ use Carp;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
-use Murakumo_Node::CLI::VPS::Disk;
 
 # boot部分を作る
 sub work {
   my ($self, $job) = @_;
 
   my $arg = $job->arg;
-use Data::Dumper;
-warn Dumper $arg;
-  no strict 'refs';
 
+  no strict 'refs';
   my %param = %$arg;
 
   my $r;
   local $@;
   eval {
+    require Murakumo_Node::CLI::VPS::Disk;
     my $obj = Murakumo_Node::CLI::VPS::Disk->new;
     $r = $obj->clone( \%param );
   };
   if (! $r or $@ ) {
-    my $log = sprintf "clone failed %s", Dumper $arg;
-    $@ and $log .= "($@)";
-    $log =~ s/\n/ /g;
+    local $Data::Dumper::Terse = 1;
+    my $log = sprintf "clone failed %s(%s)", Dumper $arg, $@;
     return $job->failed($log);
   }
 
