@@ -17,7 +17,7 @@ our $VERSION = q(0.0.1);
 sub new {
   my $class  = shift;
   my $tt     = Template->new( ABSOLUTE => 1 );
-  my $config = Murakumo_Node::CLI::Utils->new->config,
+  my $config = Murakumo_Node::CLI::Utils->new->config;
   my $obj    = bless {
                  tt     => $tt,
                  config => $config,

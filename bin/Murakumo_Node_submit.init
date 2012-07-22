@@ -1,4 +1,4 @@
-#!/home/smc/bin/perl
+#!/usr/bin/env perl
 # chkconfig: - 99 10
 # description: murakumo_node for node submit my condition
 
@@ -19,7 +19,7 @@ use XML::TreePP;
 use Carp;
 use File::Basename;
 
-use lib qw( /home/smc/Murakumo_Node/lib );
+use lib qw( /home/smc/murakumo_node/lib );
 use Murakumo_Node::CLI::Utils;
 use Murakumo_Node::CLI::Remote_JSON_API;
 

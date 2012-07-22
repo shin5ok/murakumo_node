@@ -26,6 +26,7 @@ use Data::Dumper;
 use Carp;
 use JSON;
 use URI::Escape;
+use Murakumo_Node::CLI::Utils;
 
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
@@ -39,7 +40,7 @@ sub boot :Local {
   return $c->forward( 'boot_from_json' );
 }
 
-sub boot_from_json :Local{
+sub boot_from_json :Local {
   my ( $self, $c ) = @_;
 
   my $body   = $c->request->body;
@@ -188,6 +189,8 @@ sub clone :Local {
   my $params = decode_json <$body>;
 
   my $job_model = $c->model('Job');
+
+  dumper($params);
 
   local $@;
   eval {

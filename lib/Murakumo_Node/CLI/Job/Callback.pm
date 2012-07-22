@@ -52,15 +52,6 @@ sub set_ok {
   shift->result(1);
 }
 
-# sub register_func {
-#   my ($self, $args_ref) = @_;
-#   exists $args_ref->{uri}
-#     and $self->{uri}    = $args_ref->{uri};
-#   exists $args_ref->{params}
-#     and $self->{params} = $args_ref->{params};
-# 
-# }
-
 sub call {
   my ($self, $params) = @_;
 
