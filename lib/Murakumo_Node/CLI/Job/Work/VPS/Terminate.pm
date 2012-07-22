@@ -40,5 +40,4 @@ sub work {
   $job->completed;
 
 }
-
 1;

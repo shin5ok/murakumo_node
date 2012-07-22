@@ -97,9 +97,11 @@ sub _callback {
 sub _end_of_job {
 
   my ($job_uuid, $result, $message, $callback_uri) = @_;
-warn "end_of_job argument : ", Dumper \@_;
-warn "end_of_job argument : ", join ",,", @_;
-warn "callback uri # ", $callback_uri if $callback_uri;
+
+  warn "end_of_job argument : ", Dumper \@_;
+  warn "end_of_job argument : ", join ",,", @_;
+  warn "callback uri # ", $callback_uri if $callback_uri;
+
   if (! $job_uuid) {
     warn "job uuid is not found... end_of_job() is not working... end.";
     return 0;

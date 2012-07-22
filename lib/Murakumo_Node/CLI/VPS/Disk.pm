@@ -108,8 +108,10 @@ sub remove {
       next;
     }
 
-    warn "unlink disk path: $disk_path";
-    unlink $disk_path;
+    warn "remove disk path: $disk_path";
+    my $rename_disk_path = sprintf "%s.%s", $disk_path, $config->{unlink_disk_ext};
+
+    rename $disk_path, $rename_disk_path;
     -e $disk_path and $fail_count++;
 
   }
@@ -231,10 +233,6 @@ sub clone_for_image {
 
   }
 
-  # virt-clone \
-  #   --original demo \
-  #   --name newdemo \
-  #   --file /var/lib/xen/images/newdemo.img
   $src_image_path ||= file(
                            $vm_root,
                            $template_dirname,
@@ -273,7 +271,6 @@ sub clone_for_image {
 
     # NECのディスクを操作するため、処理を切り離すように別クラスにする
     # 失敗したら例外を出すこと！
-    #
 
     require Murakumo_Node::CLI::Libvirt::Storage;
     my $libvirt_storage = Murakumo_Node::CLI::Libvirt::Storage->new;
@@ -367,8 +364,8 @@ sub make_image_cloning {
   # とりあえず、cp...
   my $cmd = "cp $org_image_path $dst_image_path";
   # my $cmd = "cp -a $org_image_path $dst_image_path";
-# $cmd = "cp -p /etc/xinetd.conf $dst_image_path";
-warn $cmd;
+
+  warn $cmd;
   my $r = system $cmd;
 
   $r == 0
