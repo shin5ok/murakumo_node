@@ -18,6 +18,7 @@ use App::Daemon qw( daemonize );
 use XML::TreePP;
 use Carp;
 use File::Basename;
+use Time::HiRes qw(usleep);
 
 use lib qw( /home/smc/murakumo_node/lib );
 use Murakumo_Node::CLI::Utils;
@@ -36,13 +37,18 @@ daemonize() if ! exists $ENV{DEBUG};
 
 # libvirt への接続
 our $vmm;
+my $submit_interval = exists $ENV{MURAKUMO_NODE_INTERVAL}
+                    ? $ENV{MURAKUMO_NODE_INTERVAL}
+                    : $config->{submit_interval};
+
 while (1) {
   local $@;
   eval {
     post_state();
   };
   $@ and syslog_write($@);
-  sleep 3;
+  usleep $submit_interval;
+
 }
 
 sub syslog_write {
