@@ -60,7 +60,6 @@ sub call {
   warn __PACKAGE__ . "::call()";
   warn Dumper $params;
 
-
   # 呼んだ
   $self->{called} = 1;
 
@@ -94,7 +93,7 @@ sub call {
     }
   }
 
-  warn sprintf "%s %s >>> %s : %s (%d)", __PACKAGE__,
+  warn sprintf "%s %s >>> %s : %s (%s)", __PACKAGE__,
                                         $self->{uri},
                                         Dumper $params,
                                         $response->content || "### ERROR ###",
@@ -114,6 +113,7 @@ sub DESTROY {
     if (! $self->is_called) {
       $self->call
         or croak "callback in DESTRUCTOR is error";
+
     }
   }
 }

@@ -7,15 +7,11 @@ use Data::Dumper;
 use Getopt::Long;
 use Carp;
 
-# if (@ARGV != 6) {
-#   croak "*** argument number expected is wrong.";
-# }
-
-warn Dumper \@ARGV;
 my %opt;
 GetOptions( \%opt, "drive=s", "mac=s", "ip=s", "mask=s", "gw=s", "hostname=s");
 
 my $debug = exists $ENV{DEBUG};
+warn Dumper \@ARGV if $debug;
 
 my ($drive, $mac, $ip, $mask, $gw, $hostname)
   = ($opt{drive}, $opt{mac}, $opt{ip}, $opt{mask}, $opt{gw}, $opt{hostname});
@@ -30,14 +26,12 @@ my %s = $h->list_filesystems;
 my $ok = 0;
 my $cfg_content = make_cfg_content();
 
-
 # code の仕様
 # 引数
 #   1. 元の設定ファイルの内容
 #   2. %opt(GetOptionsで設定されたハッシュ)のreference
 # 戻り値
 #   新しい設定ファイルの内容
-
 my @write_files_content_array = (
   {
     file    => "/etc/sysconfig/network",
@@ -49,7 +43,16 @@ my @write_files_content_array = (
                  if (($old_hostname) = $content =~ /^HOSTNAME\s*\=\s*(\S+)/msi) {
                    $hostname ||= sprintf "%s-cloned", $old_hostname;
                    $content =~ s/$old_hostname/$hostname/;
+                 } else {
+                   $content .= "HOSTNAME=cloned\n";
                  }
+
+                 if ($content =~ /^(GATEWAY\s*\=\s*\S+)/i) {
+                   $content =~ s/$1/GATEWAY=$gw/;
+                 } else {
+                   $content .= "GATEWAY=$gw\n";
+                 }
+
                  return $content;
                },
   },    
@@ -138,7 +141,6 @@ FILESYSTEMS: for my $dev ( keys %s ) {
   if ($h->exists( '/etc' )) {
 
     for my $v ( @write_files_content_array ) {
-warn Dumper $v;
       if ( exists $v->{content} ) {
         $h->write( $v->{file}, $v->{content} );
       }
@@ -151,10 +153,6 @@ warn Dumper $v;
           };
           $@ and next;
           my $func    = $v->{code};
-warn $v->{file};
-warn "#########################################";
-warn $content;
-warn "#########################################";
           my $new_content = $func->( $content, \%opt );
           $h->write( $v->{file}, $new_content );
         }
@@ -171,20 +169,14 @@ warn "#########################################";
 }
 
 if (! $ok) {
-  $debug
-    and warn "*** cfg write error";
-  # exit 1;
+  $debug and warn "*** cfg write error";
+    exit 1;
 
 } else {
-  $debug
-    and warn "cfg write ok";
-  # exit 0;
+  $debug and warn "cfg write ok";
+    exit 0;
 
 }
-
-# $h->mount_options ('', $partitions[0], '/');
-
-# print join "\n", $h->find('/etc');
 
 sub make_network_content {
   no strict 'refs';

@@ -1,10 +1,10 @@
 use warnings;
 use strict;
-package Murakumo_Node::CLI::Guestfs;
+package Murakumo_Node::CLI::Guestfs 0.03;
 use IPC::Cmd;
 use Data::Dumper;
 
-our $script = "/home/smc/Murakumo_Node/lib/Murakumo_Node/CLI/set-guest-network.pl";
+our $script = "/home/smc/murakumo_node/lib/Murakumo_Node/CLI/set-guest-network.pl";
 
 sub new {
   my $obj = bless {};

@@ -196,6 +196,7 @@ sub clone_for_image {
   my (
        $org_uuid,
        $project_id, 
+       $dst_hostname,
        # $job_uuid,
        $mac,
        $ip,
@@ -211,6 +212,7 @@ sub clone_for_image {
       = (
           $argv->{org_uuid},
           $argv->{project_id},
+          $argv->{dst_hostname},
           # $argv->{job_uuid},
           $argv->{mac},
           $argv->{ip},
@@ -289,7 +291,7 @@ sub clone_for_image {
       Murakumo_Node::CLI::Guestfs->new->set_network( {
                                                        ip       => $ip,
                                                        mac      => $mac,
-                                                       hostname => "", # 空で指定
+                                                       hostname => $dst_hostname,
                                                        drive    => $dst_image_path,
                                                        gw       => $gw,
                                                        mask     => $mask,
@@ -308,12 +310,6 @@ sub clone_for_image {
     $result = 1;
     $callback->set_result( $result );
   }
-
-  # DESTRUCTOR call... following code is not necessary
-  # if (! $callback->call(\%callback_params)) {
-  #   warn "callback error: ", Dumper \%callback_params;
-  #   critical("callback /vps/define/clone callback error ", Dumper \%callback_params);
-  # }
 
   return $result;
   
