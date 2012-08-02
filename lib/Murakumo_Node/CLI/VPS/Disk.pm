@@ -354,7 +354,7 @@ sub make_image_cloning {
   # my $cmd = "$qemu_img_cmd create -b $org_image_path -f qcow2 $dst_image_path";
 
   # とりあえず、cp...
-  my $cmd = "cp $org_image_path $dst_image_path";
+  my $cmd = "cp --sparse=auto $org_image_path $dst_image_path";
   # my $cmd = "cp -a $org_image_path $dst_image_path";
 
   warn $cmd;
