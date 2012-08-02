@@ -8,6 +8,7 @@ use IPC::Open3;
 use File::Basename;
 use File::Path qw(mkpath);
 use Data::Dumper;
+use IPC::Cmd qw(run);
 
 use JSON;
 use LWP::UserAgent;
@@ -50,7 +51,7 @@ sub create {
     $libvirt_storage->add_by_path( $disk_path );
 
     # _disk_allocate( $disk_path, $disk_size )
-    _dd_make( $disk_path, $disk_size )
+    _disk_make( $disk_path, $disk_size )
       or $fail_count++;
 
   }
@@ -159,28 +160,23 @@ sub _path_make {
 
 }
 
-sub _disk_allocate {
-  my ($file_path, $file_size) = @_;
-  # 既に存在するなら成功で返す
-  -f $file_path and return 1;
-  warn "$file_path (${file_size}kB) is creating by fallocate";
-  local $?;
-  _path_make( $file_path );
-  warn "fallocate -l $file_size $file_path";
-  system "fallocate -l $file_size $file_path";
-  return $? == 0;
-
-}
-
-sub _dd_make {
+sub _disk_make {
   my ($file_path, $file_size) = @_;
   # 既に存在するなら成功で返す
   -f $file_path and return 1;
   warn "$file_path (${file_size}kB) is creating by dd";
+
   local $?;
   _path_make( $file_path );
-  system "dd if=/dev/zero of=$file_path bs=1024 count=$file_size";
-  return $? == 0;
+
+  my $command   = sprintf "qemu-img create -f raw %s %dK", $file_path, $file_size;
+  warn $command;
+  my $disk_make = run(
+                       command => $command,
+                       timeout => 600,
+                       verbose => 1,
+                     );
+  return $disk_make;
 }
 
 sub clone {
