@@ -57,47 +57,63 @@ sub call {
 
   $params ||= $self->{params};
 
-  warn __PACKAGE__ . "::call()";
-  warn Dumper $params;
-
   # 呼んだ
   $self->{called} = 1;
 
-  require Murakumo_Node::CLI::Remote_JSON_API;
-  my $api = Murakumo_Node::CLI::Remote_JSON_API->new;
+  no strict 'refs';
+  my $callback_func = sub {
+    my $arg_ref = shift;
+    my ($uri, $params) = @$arg_ref;
+    require Murakumo_Node::CLI::Remote_JSON_API;
+    my $api = Murakumo_Node::CLI::Remote_JSON_API->new;
 
-  my $response = $api->json_post($self->{uri}, $params);
-
-  if ($response->is_success) {
-
-    my $r = decode_json $response->content;
-
-    if ($r->{result}) {
-      return 1;
-    }
-
-  } else {
+    local $Data::Dumper::Terse = 1;
 
     no strict 'refs';
-    if ($self->{retry_by_mail}) {
+    warn "callback try to: $uri ", Dumper $params;
+    my $response = $api->json_post($uri, $params);
+    if ($response and $response->is_success) {
+      my $r;
+      eval {
+        $r = decode_json $response->content;
+      };
+      return $r->{result};
 
-      my $data = $params;
+    } else {
+      return 0;
+    }
+  };
 
-      # POST で接続できなかったら、メールで再試行
-      # 将来、メッセージキューに置き換える
-      my $config = Murakumo_Node::CLI::Utils->new->config;
-      require Murakumo_Node::CLI::Mail_API;
-      Murakumo_Node::CLI::Mail_API->new ( $config->{mail_api_to} )
-                                  ->post( $self->{uri}, $data, { type => "json" } );
+  if (! $callback_func->([ $self->{uri}, $params ]) ) {
+    warn "retry callback";
+    no strict 'refs';
+    if ( ! $self->{not_retry} ) {
+      require Murakumo_Node::CLI::Job;
+      my $job_model = Murakumo_Node::CLI::Job->new;
+      $job_model->register('Retry', { func => $callback_func, func_args => [ $self->{uri}, $params ] });
 
     }
+
+    # no strict 'refs';
+    # if ($self->{retry_by_mail}) {
+
+    #   my $data = $params;
+
+    #   # POST で接続できなかったら、メールで再試行
+    #   # 将来、メッセージキューに置き換える
+    #   my $config = Murakumo_Node::CLI::Utils->new->config;
+    #   require Murakumo_Node::CLI::Mail_API;
+    #   Murakumo_Node::CLI::Mail_API->new ( $config->{mail_api_to} )
+    #                               ->post( $self->{uri}, $data, { type => "json" } );
+
+    # }
   }
 
-  warn sprintf "%s %s >>> %s : %s (%s)", __PACKAGE__,
-                                        $self->{uri},
-                                        Dumper $params,
-                                        $response->content || "### ERROR ###",
-                                        $response->code    || 000;
+  # warn sprintf "%s %s >>> %s : %s (%s)", __PACKAGE__,
+  #                                       $self->{uri},
+  #                                       Dumper $params,
+  #                                       $response->content || "### ERROR ###",
+  #                                       $response->code    || 000;
 
   return 0;
 
