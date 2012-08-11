@@ -88,7 +88,7 @@ sub post_state {
   warn Dumper $parameter if $ENV{DEBUG};
 
   my $response = $web_agent->json_post('/node/register', $parameter);
-  if ($response->is_success) {
+  if ($response and $response->is_success) {
     syslog_write( $response->content );
   } else {
     syslog_write( sprintf "%s :%s", $response->content, $response->code );
