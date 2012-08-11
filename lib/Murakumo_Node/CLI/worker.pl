@@ -10,8 +10,10 @@ use Storable;
 
 use lib qw(/home/smc/Murakumo_Node/lib);
 use Murakumo_Node::CLI::Job;
+use Murakumo_Node::CLI::Utils;
 
-my $dbpath = q(/home/smc/Murakumo_Node/lib/Murakumo_Node/CLI/job.db);
+my $config = Murakumo_Node::CLI::Utils->config;
+my $dbpath = $config->{job_db_path};
 
 my $c = TheSchwartz->new( databases => [ +{ dsn => 'dbi:SQLite:dbname='. $dbpath, } ], verbose => 1, );
 
