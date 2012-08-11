@@ -6,12 +6,21 @@ use Carp;
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
+use Murakumo_Node::CLI::Utils;
+
+my $config = Murakumo_Node::CLI::Utils->config;
+
 sub work {
   my ($self, $job) = @_;
 
   my $func      = $job->arg->{func};
   my $func_args = $job->arg->{func_args};
-  my $retry = 100;
+  my $retry = exists $config->{retry_count} 
+              ? $config->{retry_count}
+              : 3600;
+
 
   my $ok  = 0;
   my $log = "";
