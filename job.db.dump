@@ -1,0 +1,103 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE funcmap (
+        funcid         INTEGER PRIMARY KEY AUTOINCREMENT,
+        funcname       VARCHAR(255) NOT NULL,
+        UNIQUE(funcname)
+);
+INSERT INTO "funcmap" VALUES(1,'Murakumo_Node::CLI::Job::Work');
+CREATE TABLE job (
+        jobid           INTEGER PRIMARY KEY AUTOINCREMENT,
+        funcid          INTEGER UNSIGNED NOT NULL,
+        arg             MEDIUMBLOB,
+        uniqkey         VARCHAR(255) NULL,
+        insert_time     INTEGER UNSIGNED,
+        run_after       INTEGER UNSIGNED NOT NULL,
+        grabbed_until   INTEGER UNSIGNED NOT NULL,
+        priority        SMALLINT UNSIGNED,
+        coalesce        VARCHAR(255),
+        UNIQUE(funcid,uniqkey)
+);
+CREATE TABLE error (
+        error_time      INTEGER UNSIGNED NOT NULL,
+        jobid           INTEGER NOT NULL,
+        message         VARCHAR(255) NOT NULL,
+        funcid          INT UNSIGNED NOT NULL DEFAULT 0
+);
+INSERT INTO "error" VALUES(1344494133,1,'clone failed {
+  ''gw'' => ''10.1.1.254'',
+  ''ip'' => ''10.1.1.41'',
+  ''org_uuid'' => ''ecbd70ba-bde3-11e1-990a-8b64ed8143b2'',
+  ''callback_host'' => ''192.168.233.83'',
+  ''set_network'' => 1,
+  ''assign_ip'' => 1,
+  ''mac'' => ''52:54:00:69:0b:59'',
+  ''project_id'' => ''111'',
+  ''mask'' => ''255.255.255.0'',
+  ''_worker_class'' => ''VPS::Clone'',
+  ''reserve_uuid'' => ''4ad5acd6-e1ec-11e1-bb7a-6e3ced8143b2'',
+  ''job_uuid'' => ''4aec0e0e-e1ec-11e1-bb7a-6e3ced8143b2'',
+  ''name'' => ''test-clone001'',
+  ''vlan_id'' => ''200'',
+  ''dst_image_path'' => ''/nfs/e0887088-3727-46dc-8b4a-5f832e231860/111/4ad5993a-e1ec-11e1-bb7a-6e3ced8143b2-01.img'',
+  ''dst_hostname'' => ''test-clone001'',
+  ''dst_uuid'' => ''4ad5993a-e1ec-11e1-bb7a-6e3ced8143b2'',
+  ''src_image_path'' => ''/nfs/e0887088-3727-46dc-8b4a-5f832e231860/111/ecbd70ba-bde3-11e1-990a-8b64ed8143b2-01.img''
+}
+(''''
+)',1);
+INSERT INTO "error" VALUES(1344494183,2,'clone failed {
+  ''gw'' => ''10.1.1.254'',
+  ''ip'' => ''10.1.1.41'',
+  ''org_uuid'' => ''ecbd70ba-bde3-11e1-990a-8b64ed8143b2'',
+  ''callback_host'' => ''192.168.233.83'',
+  ''set_network'' => 1,
+  ''assign_ip'' => 1,
+  ''mac'' => ''52:54:00:05:27:b8'',
+  ''project_id'' => ''111'',
+  ''mask'' => ''255.255.255.0'',
+  ''_worker_class'' => ''VPS::Clone'',
+  ''reserve_uuid'' => ''762565f2-e1ec-11e1-bb7a-6e3ced8143b2'',
+  ''job_uuid'' => ''763c648c-e1ec-11e1-bb7a-6e3ced8143b2'',
+  ''name'' => ''test-clone001'',
+  ''vlan_id'' => ''200'',
+  ''dst_image_path'' => ''/nfs/e0887088-3727-46dc-8b4a-5f832e231860/111/762557e2-e1ec-11e1-bb7a-6e3ced8143b2-01.img'',
+  ''dst_hostname'' => ''test-clone001'',
+  ''dst_uuid'' => ''762557e2-e1ec-11e1-bb7a-6e3ced8143b2'',
+  ''src_image_path'' => ''/nfs/e0887088-3727-46dc-8b4a-5f832e231860/111/ecbd70ba-bde3-11e1-990a-8b64ed8143b2-01.img''
+}
+(''''
+)',1);
+INSERT INTO "error" VALUES(1344494256,3,'clone failed {
+  ''gw'' => ''10.1.1.254'',
+  ''ip'' => ''10.1.1.41'',
+  ''org_uuid'' => ''ecbd70ba-bde3-11e1-990a-8b64ed8143b2'',
+  ''callback_host'' => ''192.168.233.83'',
+  ''set_network'' => 1,
+  ''assign_ip'' => 1,
+  ''mac'' => ''52:54:00:81:89:6e'',
+  ''project_id'' => ''111'',
+  ''mask'' => ''255.255.255.0'',
+  ''_worker_class'' => ''VPS::Clone'',
+  ''reserve_uuid'' => ''a66a3ad0-e1ec-11e1-bb7a-6e3ced8143b2'',
+  ''job_uuid'' => ''a6804280-e1ec-11e1-bb7a-6e3ced8143b2'',
+  ''name'' => ''test-clone001'',
+  ''vlan_id'' => ''200'',
+  ''dst_image_path'' => ''/nfs/e0887088-3727-46dc-8b4a-5f832e231860/111/a66a31b6-e1ec-11e1-bb7a-6e3ced8143b2-01.img'',
+  ''dst_hostname'' => ''test-clone001'',
+  ''dst_uuid'' => ''a66a31b6-e1ec-11e1-bb7a-6e3ced8143b2'',
+  ''src_image_path'' => ''/nfs/e0887088-3727-46dc-8b4a-5f832e231860/111/ecbd70ba-bde3-11e1-990a-8b64ed8143b2-01.img''
+}
+(''''
+)',1);
+CREATE TABLE exitstatus (
+        jobid           INTEGER PRIMARY KEY NOT NULL,
+        funcid          INT UNSIGNED NOT NULL DEFAULT 0,
+        status          SMALLINT UNSIGNED,
+        completion_time INTEGER UNSIGNED,
+        delete_after    INTEGER UNSIGNED
+);
+DELETE FROM sqlite_sequence;
+INSERT INTO "sqlite_sequence" VALUES('funcmap',1);
+INSERT INTO "sqlite_sequence" VALUES('job',3);
+COMMIT;

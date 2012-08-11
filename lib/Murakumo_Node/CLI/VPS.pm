@@ -284,6 +284,7 @@ sub make_bridge_and_storage_pool {
     my $libvirt_iface = Murakumo_Node::CLI::Libvirt::IFace->new;
     for my $br ( @{$hash_ref->{br}} ) {
 
+      # $libvirt_iface->add( $br );
       $libvirt_iface->make_br_and_vlan( $br );
     }
   }

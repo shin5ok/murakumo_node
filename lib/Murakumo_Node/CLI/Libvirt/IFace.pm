@@ -82,7 +82,6 @@ sub make_br_and_vlan {
     }
 
     my $content = $br_f->slurp;
-    # if ($content !~ /^0x1003$/ms) {
     if ($content !~ /^0x1003$/ms
       or $ip_link !~ /$br\@[^\n]+state\s+UP/) {
 
