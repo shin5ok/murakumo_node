@@ -111,21 +111,15 @@ sub _end_of_job {
 
   if ($callback_uri) {
 
-    my $www_ua = LWP::UserAgent->new; 
-    my $param;
-
     no strict 'refs';
-    $param->{message}  = $message || "";
-    $param->{result}   = $result;
-    $param->{job_uuid} = $job_uuid;
 
-   my $request = POST qq/$callback_uri/, [$param];
-
-    $www_ua->timeout(10);
-    my $respones = $www_ua->request($request);
+    my $params;
+    $params->{message}  = $message || "";
+    $params->{result}   = $result;
+    $params->{job_uuid} = $job_uuid;
 
     require Murakumo_Node::CLI::Remote_JSON_API;
-    my $api_result = Murakumo_Node::CLI::Remote_JSON_API->new($callback_uri)->json_post('', $param);
+    my $api_result = Murakumo_Node::CLI::Remote_JSON_API->new($callback_uri)->json_post('', $params);
     return $api_result->{result};
 
   }

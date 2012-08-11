@@ -17,9 +17,9 @@ sub work {
 
   my $func      = $job->arg->{func};
   my $func_args = $job->arg->{func_args};
-  my $retry = exists $config->{retry_count} 
-              ? $config->{retry_count}
-              : 3600;
+  my $retry     = exists $config->{retry_count} 
+                ? $config->{retry_count}
+                : 3600;
 
 
   my $ok  = 0;

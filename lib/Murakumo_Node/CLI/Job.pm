@@ -18,17 +18,21 @@ use Murakumo_Node::CLI::Utils;
 
 my $config   = Murakumo_Node::CLI::Utils->config;
 
-our $dbpath  = $config->{job_db_path};
-our $dbparam = {
-       dsn => 'dbi:SQLite:dbname=' . $dbpath,
-    };
-
 sub new {
   my ($class, $args) = @_;
 
   my %ts_init_args;
   $ts_init_args{verbose}   = exists $ENV{DEBUG};
-  $ts_init_args{databases} = [ $dbparam ];
+
+  my $db_path = exists $args->{db_path}
+              ? $args->{db_path}
+              : $config->{job_db_path};
+
+  $ts_init_args{databases} = [ { dsn => 'dbi:SQLite:dbname=' . $db_path } ];
+
+  warn "#############";
+  warn Dumper \%ts_init_args;
+  warn "#############";
 
   my $obj = TheSchwartz->new( %ts_init_args );
 

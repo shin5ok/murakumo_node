@@ -5,12 +5,12 @@
 use strict;
 use warnings;
 use Sys::Virt;
+use POSIX;
 use LWP::UserAgent;
 use HTTP::Request::Common q(POST);
 use Data::Dumper;
 use URI;
 use JSON;
-use POSIX;
 use Sys::Hostname;
 use Sys::Syslog qw(:DEFAULT setlogsock);
 use Path::Class;

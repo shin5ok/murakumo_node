@@ -88,8 +88,12 @@ sub call {
     warn "retry callback";
     no strict 'refs';
     if ( ! $self->{not_retry} ) {
+
       require Murakumo_Node::CLI::Job;
-      my $job_model = Murakumo_Node::CLI::Job->new;
+      require Murakumo_Node::CLI::Utils;
+
+      my $config = Murakumo_Node::CLI::Utils->config;
+      my $job_model = Murakumo_Node::CLI::Job->new({ db_path => $config->{retry_db_path} });
       $job_model->register('Retry', { func => $callback_func, func_args => [ $self->{uri}, $params ] });
 
     }
