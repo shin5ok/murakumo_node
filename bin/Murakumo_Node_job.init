@@ -25,16 +25,18 @@ newdaemon(
   pidfile    => '/var/run/' .  $progname . ".pid",
 );
 
-my $config  = Murakumo_Node::CLI::Utils->config;
-my $db_path = $config->{job_db_path};
-if ( $0 =~ /retry/i ) {
-  $db_path = $config->{retry_db_path};
-}
-
 sub gd_preconfig {}
 
 sub gd_run {
+  my $config  = Murakumo_Node::CLI::Utils->config;
 
+  my $db_path = $config->{job_db_path};
+  if ( $0 =~ /retry/i ) {
+    $db_path = $config->{retry_db_path};
+  }
+  warn $db_path;
+
+  $0 = "$0 ( $db_path )";
   my $c = TheSchwartz->new( databases => [ +{ dsn => 'dbi:SQLite:dbname='. $db_path, } ], verbose => 0, );
   
   eval qq{use Murakumo_Node::CLI::Job::Work;};
