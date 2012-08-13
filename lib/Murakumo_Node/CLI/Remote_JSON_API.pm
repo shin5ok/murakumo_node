@@ -18,8 +18,10 @@ our $wwwua  = do { my $ua = LWP::UserAgent->new; $ua->timeout(10); $ua };
 sub new {
   my $class   = shift;
   my $api_uri = shift;
+  my $query   = shift || undef; # uri に 追加するquery
   return bless +{
            api_uri => $api_uri,
+           query   => $query,
          }, $class;
 }
 
@@ -27,12 +29,16 @@ sub get {
   my ($self, $uri_path, $param) = @_;
   no strict 'refs';
   my $api_uri = $self->{api_uri} || $config->{api_uri};
-  warn "api_uri : $api_uri";
-  warn "uri_path: $uri_path";
   my $uri = URI->new( $api_uri ."/". $uri_path );
+
+  if ($self->{query}) {
+    %$param = ( %$param, %{$self->{query}} );
+  }
+
   $uri->query_form(%$param);
 
   my $response = $wwwua->get( $uri );
+  warn $uri;
 
   if ($response->is_success) {
     return $response;
@@ -55,6 +61,11 @@ sub json_post {
     my $api_uri = $self->{api_uri} || $config->{api_uri};
     $uri = URI->new( $api_uri ."/". $uri_path );
   }
+
+  $self->{query}
+    and $uri->query_form( %{$self->{query}} );
+
+  warn $uri;
 
   my $request = HTTP::Request->new( 'POST', $uri );
   $request->header('Content-Type' => 'application/json');

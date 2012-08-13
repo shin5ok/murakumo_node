@@ -30,7 +30,9 @@ $App::Daemon::logfile  = "/var/log/" . basename __FILE__ . ".log";
 $App::Daemon::as_user  = "root";
 
 my $config    = Murakumo_Node::CLI::Utils->config;
-my $web_agent = Murakumo_Node::CLI::Remote_JSON_API->new(qq{http://$config->{callback_host}:3000});
+my $api_key   = $config->{api_key};
+my $web_agent = Murakumo_Node::CLI::Remote_JSON_API->new(qq{http://$config->{callback_host}:3000}, { key => $api_key, });
+
 
 my $node  = hostname();
 daemonize() if ! exists $ENV{DEBUG};
@@ -87,7 +89,7 @@ sub post_state {
   }
   warn Dumper $parameter if $ENV{DEBUG};
 
-  my $response = $web_agent->json_post('/node/register', $parameter);
+  my $response = $web_agent->json_post('/node/register/', $parameter);
   if ($response and $response->is_success) {
     syslog_write( $response->content );
   } else {
