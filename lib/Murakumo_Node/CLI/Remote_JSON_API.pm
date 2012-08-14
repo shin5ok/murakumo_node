@@ -25,6 +25,12 @@ sub new {
          }, $class;
 }
 
+sub add_query {
+  my $self  = shift;
+  my $query = shift;
+  $self->{query} = $query;
+}
+
 sub get {
   my ($self, $uri_path, $param) = @_;
   no strict 'refs';
@@ -69,7 +75,6 @@ sub json_post {
 
   my $request = HTTP::Request->new( 'POST', $uri );
   $request->header('Content-Type' => 'application/json');
-  warn Dumper $params;
   $request->content( encode_json $params );
 
   my $response = $wwwua->request( $request );
