@@ -29,12 +29,20 @@ $App::Daemon::pidfile  = "/var/run/" . basename __FILE__ . ".pid";
 $App::Daemon::logfile  = "/var/log/" . basename __FILE__ . ".log";
 $App::Daemon::as_user  = "root";
 
-my $config    = Murakumo_Node::CLI::Utils->config;
-my $api_key   = $config->{api_key};
-my $web_agent = Murakumo_Node::CLI::Remote_JSON_API->new(qq{http://$config->{callback_host}:3000}, { key => $api_key, });
+my $utils     = Murakumo_Node::CLI::Utils->new;
+my $config    = $utils->config;
+my $key       = $utils->get_api_key;
+my $node      = hostname();
+my $web_agent = Murakumo_Node::CLI::Remote_JSON_API->new(
+                                                          qq{http://$config->{callback_host}:3000},
+                                                          {
+                                                            key  => $key->{api_key},
+                                                            uuid => $key->{uuid},
+                                                            name => $node,
+                                                          },
+                                                        );
 
 
-my $node  = hostname();
 daemonize() if ! exists $ENV{DEBUG};
 
 # libvirt への接続

@@ -121,11 +121,13 @@ sub get_api_key {
 
   open my $fh, "<", $self->config->{api_key_file}
     or croak "api key file open error";
-  my $api_key_text = <$fh>;
+  my $api_key_text = do { local $/; <$fh> };
   close $fh;
-  my ($api_key) = $api_key_text =~ /(\S+)/;
 
-  return $api_key;
+  # decode できなければ例外だす
+  my $ref = decode_json $api_key_text;
+  return $ref;
+
 }
 
 1;
