@@ -70,7 +70,6 @@ sub call {
     local $Data::Dumper::Terse = 1;
 
     no strict 'refs';
-    warn "callback try to: $uri ", Dumper $params;
     my $response = $api->json_post($uri, $params);
     if ($response and $response->is_success) {
       my $r;

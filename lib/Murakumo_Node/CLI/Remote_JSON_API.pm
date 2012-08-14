@@ -5,6 +5,7 @@ package Murakumo_Node::CLI::Remote_JSON_API 0.01;
 
 use LWP::UserAgent;
 use HTTP::Request::Common qw( GET POST );
+use Sys::Hostname;
 use URI;
 use JSON;
 use Data::Dumper;
@@ -12,7 +13,8 @@ use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
 
-our $config = Murakumo_Node::CLI::Utils->config;
+our $utils  = Murakumo_Node::CLI::Utils->new;
+our $config = $utils->config;
 our $wwwua  = do { my $ua = LWP::UserAgent->new; $ua->timeout(10); $ua };
 
 sub new {
@@ -25,10 +27,13 @@ sub new {
          }, $class;
 }
 
-sub add_query {
+sub query {
   my $self  = shift;
   my $query = shift;
-  $self->{query} = $query;
+  if ($query) {
+    $self->{query} = $query;
+  }
+  return $self->{query};
 }
 
 sub get {
@@ -68,10 +73,21 @@ sub json_post {
     $uri = URI->new( $api_uri ."/". $uri_path );
   }
 
-  $self->{query}
-    and $uri->query_form( %{$self->{query}} );
+  my $query = $self->query;
+  if (! $query) {
+    my $key = $utils->get_api_key;
+    $query = {
+      name => hostname(),
+      key  => $key->{api_key},
+      uuid => $key->{uuid},
+    };
+  }
+  $uri->query_form( %{$query} );
 
+  warn "----- json_post ------------------------";
   warn $uri;
+  warn Dumper $params;
+  warn "----------------------------------------";
 
   my $request = HTTP::Request->new( 'POST', $uri );
   $request->header('Content-Type' => 'application/json');

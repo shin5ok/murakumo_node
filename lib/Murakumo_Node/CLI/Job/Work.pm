@@ -119,7 +119,8 @@ sub _end_of_job {
     $params->{job_uuid} = $job_uuid;
 
     require Murakumo_Node::CLI::Remote_JSON_API;
-    my $api_result = Murakumo_Node::CLI::Remote_JSON_API->new($callback_uri)->json_post('', $params);
+    # my $api_result = Murakumo_Node::CLI::Remote_JSON_API->new($callback_uri)->json_post('', $params);
+    my $api_result = Murakumo_Node::CLI::Remote_JSON_API->new->json_post($callback_uri, $params);
     return $api_result->{result};
 
   }
