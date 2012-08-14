@@ -42,8 +42,21 @@ sub get {
   my $api_uri = $self->{api_uri} || $config->{api_uri};
   my $uri = URI->new( $api_uri ."/". $uri_path );
 
-  if ($self->{query}) {
-    %$param = ( %$param, %{$self->{query}} );
+  my $query = $self->query;
+  if (! exists $query->{key}) {
+
+    my $key = $utils->get_api_key;
+    my $api_valid_query = {
+      name      => hostname(),
+      key       => $key->{api_key},
+      node_uuid => $key->{node_uuid},
+    };
+
+    warn Dumper $param;
+
+    %$param = ( %$param, %{$api_valid_query} );
+    warn Dumper $param;
+
   }
 
   $uri->query_form(%$param);
@@ -74,12 +87,12 @@ sub json_post {
   }
 
   my $query = $self->query;
-  if (! $query) {
+  if (! exists $query->{key}) {
     my $key = $utils->get_api_key;
     $query = {
-      name => hostname(),
-      key  => $key->{api_key},
-      uuid => $key->{uuid},
+      name      => hostname(),
+      key       => $key->{api_key},
+      node_uuid => $key->{node_uuid},
     };
   }
   $uri->query_form( %{$query} );

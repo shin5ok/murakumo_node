@@ -36,9 +36,9 @@ my $node      = hostname();
 my $web_agent = Murakumo_Node::CLI::Remote_JSON_API->new(
                                                           qq{http://$config->{callback_host}:3000},
                                                           {
-                                                            key  => $key->{api_key},
-                                                            uuid => $key->{uuid},
-                                                            name => $node,
+                                                            key       => $key->{api_key},
+                                                            node_uuid => $key->{node_uuid},
+                                                            name      => $node,
                                                           },
                                                         );
 
