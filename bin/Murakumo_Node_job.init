@@ -14,12 +14,19 @@ use Storable;
   no warnings;
   $Storable::Eval= 1;
 }
-
 use lib qw(/home/smc/murakumo_node/lib);
 use Murakumo_Node::CLI::Job;
 use Murakumo_Node::CLI::Utils;
 
-my $progname = basename __FILE__;
+my $config  = Murakumo_Node::CLI::Utils->config;
+my $db_path  = $config->{job_db_path};
+my $progname = "murakumo_node_job";
+
+if ( $0 =~ /retry/i ) {
+  $db_path  = $config->{retry_db_path};
+  $progname = "murakumo_node_regry";
+}
+
 newdaemon(
   progname   => $progname,
   pidfile    => '/var/run/' .  $progname . ".pid",
@@ -28,13 +35,6 @@ newdaemon(
 sub gd_preconfig {}
 
 sub gd_run {
-  my $config  = Murakumo_Node::CLI::Utils->config;
-
-  my $db_path = $config->{job_db_path};
-  if ( $0 =~ /retry/i ) {
-    $db_path = $config->{retry_db_path};
-  }
-  warn $db_path;
 
   $0 = "$0 ( $db_path )";
   my $c = TheSchwartz->new( databases => [ +{ dsn => 'dbi:SQLite:dbname='. $db_path, } ], verbose => 0, );

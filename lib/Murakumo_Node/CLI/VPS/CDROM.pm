@@ -10,7 +10,6 @@ use Data::Dumper;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
-use Murakumo_Node::CLI::Guestfs;
 use Murakumo_Node::CLI::Utils;
 use Murakumo_Node::CLI::Libvirt;
 use base qw(Murakumo_Node::CLI::Libvirt);

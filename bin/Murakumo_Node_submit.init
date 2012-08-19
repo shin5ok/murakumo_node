@@ -24,9 +24,11 @@ use lib qw( /home/smc/murakumo_node/lib );
 use Murakumo_Node::CLI::Utils;
 use Murakumo_Node::CLI::Remote_JSON_API;
 
+my $progname = "murakumo_node_submit";
+
 $App::Daemon::kill_sig = SIGINT;
-$App::Daemon::pidfile  = "/var/run/" . basename __FILE__ . ".pid";
-$App::Daemon::logfile  = "/var/log/" . basename __FILE__ . ".log";
+$App::Daemon::pidfile  = "/var/run/" . $progname . ".pid";
+$App::Daemon::logfile  = "/var/log/" . $progname . ".log";
 $App::Daemon::as_user  = "root";
 
 my $utils     = Murakumo_Node::CLI::Utils->new;

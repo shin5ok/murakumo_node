@@ -2,13 +2,24 @@ use warnings;
 use strict;
 package Murakumo_Node::CLI::Guestfs 0.03;
 use IPC::Cmd;
+use Carp;
 use Data::Dumper;
 
-our $script = "/home/smc/murakumo_node/lib/Murakumo_Node/CLI/set-guest-network.pl";
+our $script = "/usr/local/bin/set-guest-network.pl";
 
 sub new {
+  my $class       = shift;
+  my $script_path = shift;
+  $script_path ||= $script;
+
   my $obj = bless {};
+  $obj->{script} = $script_path;
+
+  -x $obj->{script}
+    or croak "*** $obj->{script} is not execute...";
+
   return $obj;
+
 }
 
 sub set_network {
@@ -26,7 +37,7 @@ sub set_network {
   }
  
   my $command = sprintf $command_t,
-                        $script,
+                        $self->{script},
                         $drive,
                         $mac,
                         $ip,

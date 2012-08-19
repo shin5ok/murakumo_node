@@ -63,9 +63,7 @@ sub create {
 
   my %callback_params = (
                            project_id   => $project_id,
-                           # job_uuid     => $job_uuid,
                            reserve_uuid => $reserve_uuid,
-                           # result       => 0, # デフォルト失敗
                            vps_uuid     => $vps_uuid,
                          );
 
@@ -94,9 +92,6 @@ sub remove {
   my $disks      = $params->{disks};
 
   my $fail_count = 0;
-  warn "--- remove ---";
-  warn Dumper $params;
-  warn "--------------";
 
   require Murakumo_Node::CLI::Libvirt::Storage;
   my $libvirt_storage = Murakumo_Node::CLI::Libvirt::Storage->new;
@@ -135,12 +130,6 @@ sub remove {
     $callback->set_result( 1 );
   }     
 
-  # DESTRUCTOR call... following code is not necessary
-  # if (! $callback->call(\%callback_params)) {
-  #   critical("callback /vps/disk/remove/ error ", Dumper \%callback_params);
-  # }
-
-  warn "fail count > $fail_count";
   return $fail_count == 0;
 
 }
@@ -284,14 +273,15 @@ sub clone_for_image {
 
       # コピーしたディスクに、ip と mac を書き込み
       # !!!!! まだ ダミー !!!!!
-      Murakumo_Node::CLI::Guestfs->new->set_network( {
-                                                       ip       => $ip,
-                                                       mac      => $mac,
-                                                       hostname => $dst_hostname,
-                                                       drive    => $dst_image_path,
-                                                       gw       => $gw,
-                                                       mask     => $mask,
-                                                   } )
+      Murakumo_Node::CLI::Guestfs->new( $config->{guestfs_script_path} )
+                                 ->set_network( {
+                                                 ip       => $ip,
+                                                 mac      => $mac,
+                                                 hostname => $dst_hostname,
+                                                 drive    => $dst_image_path,
+                                                 gw       => $gw,
+                                                 mask     => $mask,
+                                             } )
       or croak "*** set_network is error";
     }
 
