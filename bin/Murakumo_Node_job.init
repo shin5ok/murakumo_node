@@ -24,7 +24,7 @@ my $progname = "murakumo_node_job";
 
 if ( $0 =~ /retry/i ) {
   $db_path  = $config->{retry_db_path};
-  $progname = "murakumo_node_regry";
+  $progname = "murakumo_node_retry";
 }
 
 newdaemon(
