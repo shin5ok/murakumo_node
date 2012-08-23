@@ -1,6 +1,7 @@
 #!/usr/bin/perl
-use strict;
+# /etc 以下の設定ファイルの書き換えuse strict;
 use warnings;
+use strict;
 
 use Sys::Guestfs;
 use Data::Dumper;
@@ -13,6 +14,11 @@ GetOptions( \%opt, "drive=s", "mac=s", "ip=s", "mask=s", "gw=s", "hostname=s");
 my $debug = exists $ENV{DEBUG};
 warn Dumper \@ARGV if $debug;
 
+for my $key ( qw( drive mac ip mask gw hostname ) ) {
+  (exists $opt{$key} and $opt{$key})
+    or croak "*** $key parameter error";
+}
+
 my ($drive, $mac, $ip, $mask, $gw, $hostname)
   = ($opt{drive}, $opt{mac}, $opt{ip}, $opt{mask}, $opt{gw}, $opt{hostname});
 
@@ -23,7 +29,6 @@ $h->add_drive_opts ( $drive, format => 'raw', readonly => 0 );
 $h->launch;
 my %s = $h->list_filesystems;
 
-my $ok = 0;
 my $cfg_content = make_cfg_content();
 
 # code の仕様
@@ -88,7 +93,7 @@ my @write_files_content_array = (
 
                  }
 
-                 warn "persistent =~ s/$old_mac/$new_mac/";
+                 warn "persistent =~ s/$old_mac/$new_mac/" if $debug;
                  $old_mac and
                    $content =~ s/$old_mac/$new_mac/;
 
@@ -99,7 +104,6 @@ my @write_files_content_array = (
   {
     file    => "/etc/sysconfig/hwconf",
     code    => sub {
-                 system "touch /tmp/kawano";
                  my ($content, $opt_ref) = @_;
                  my $new_mac = $opt_ref->{mac};
                  $new_mac or return;
@@ -115,7 +119,7 @@ my @write_files_content_array = (
                      ^ \- $
                    /xsm;
 
-                   warn "eth0_part: ", $eth0_part;
+                   warn "eth0_part: ", $eth0_part if $debug;
 
 
                  $eth0_part or return $content;
@@ -124,22 +128,23 @@ my @write_files_content_array = (
                    ^ network \. hwaddr : \s* (\S+)
                    /xsm;
 
-                 warn "hwconf =~ s/$old_mac/$new_mac/";
+                 warn "hwconf =~ s/$old_mac/$new_mac/" if $debug;
                  $old_mac and
                    $content =~ s/$old_mac/$new_mac/;
 
                  return $content;
                },
-    # content => "",
   },
 );
 
+my $failure = 0;
 FILESYSTEMS: for my $dev ( keys %s ) {
 
   $s{$dev} eq 'swap' and next;
   $h->mount( $dev, '/' );
   if ($h->exists( '/etc' )) {
 
+    __WRITE__FILES__:
     for my $v ( @write_files_content_array ) {
       if ( exists $v->{content} ) {
         $h->write( $v->{file}, $v->{content} );
@@ -150,31 +155,32 @@ FILESYSTEMS: for my $dev ( keys %s ) {
           local $@;
           eval {
             $content = $h->read_file( $v->{file} );
+            my $func    = $v->{code};
+            my $new_content = $func->( $content, \%opt );
+            $h->write( $v->{file}, $new_content );
           };
-          $@ and next;
-          my $func    = $v->{code};
-          my $new_content = $func->( $content, \%opt );
-          $h->write( $v->{file}, $new_content );
+          if ($@) {
+            $failure = 1;
+            next __WRITE__FILES__;
+          }
         }
       }
     }
 
-    if ($h->sync) {
-      $ok = 1;
-    }
-
     last FILESYSTEMS;
 
+  } else {
+    $h->umount( $dev );
   }
 }
 
-if (! $ok) {
+if ($failure) {
   $debug and warn "*** cfg write error";
-    exit 1;
+  exit 1;
 
 } else {
   $debug and warn "cfg write ok";
-    exit 0;
+  exit 0;
 
 }
 
@@ -205,9 +211,6 @@ HWADDR=$mac
 ONBOOT=yes
 BOOTPROTO=static
 __EOD__
-warn "+++++++++++++++++++";
-warn $_x;
-warn "+++++++++++++++++++";
-  return $_x;
 
+  return $_x;
 }
