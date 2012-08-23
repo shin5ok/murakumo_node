@@ -58,8 +58,8 @@ sub run {
   # --unsafe が必要になる
   # 本当は vpsのディスクのcache を "none" にするべき
   my $unsafe = $self->conn->get_library_version > 9004
-             ? ''
-             : '--unsafe';
+             ? '--unsafe'
+             : '';
 
   return scalar IPC::Cmd::run( command => "virsh migrate $unsafe $uuid $uri", timeout => 600, verbose => 1, );
 
