@@ -22,9 +22,11 @@ my $config  = Murakumo_Node::CLI::Utils->config;
 my $db_path  = $config->{job_db_path};
 my $progname = "murakumo_node_job";
 
+my $sleep = 1;
 if ( $0 =~ /retry/i ) {
   $db_path  = $config->{retry_db_path};
   $progname = "murakumo_node_retry";
+  $sleep    = 30;
 }
 
 newdaemon(
@@ -42,7 +44,7 @@ sub gd_run {
   eval qq{use Murakumo_Node::CLI::Job::Work;};
   $c->can_do('Murakumo_Node::CLI::Job::Work');
   
-  $c->work( 1 );
+  $c->work( $sleep );
 
 }
 
