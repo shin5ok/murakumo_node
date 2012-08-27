@@ -84,7 +84,7 @@ sub call {
   };
 
   if (! $callback_func->([ $self->{uri}, $params ]) ) {
-    warn "retry callback";
+
     no strict 'refs';
     if ( ! $self->{not_retry} ) {
 
@@ -97,7 +97,6 @@ sub call {
 
     }
 
-    # no strict 'refs';
     # if ($self->{retry_by_mail}) {
 
     #   my $data = $params;

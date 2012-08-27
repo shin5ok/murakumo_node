@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-package Murakumo_Node::CLI::VPS;
+package Murakumo_Node::CLI::VPS 0.05;
 use XML::TreePP;
 use Carp;
 use Try::Tiny;
@@ -13,8 +13,7 @@ use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Libvirt;
 use Murakumo_Node::CLI::Utils;
-
-use base q(Murakumo_Node::CLI::Libvirt);
+use base qw(Murakumo_Node::CLI::Libvirt);
 
 my $config = Murakumo_Node::CLI::Utils->new->config;
 
@@ -103,7 +102,7 @@ sub boot2 {
   my $callback_uri = sprintf "http://%s:3000/vps/boot_tmp_cleanup/", $config->{callback_host};
 
   require Murakumo_Node::CLI::Job::Callback;
-  my $callback = Murakumo_Node::CLI::Job::Callback->new({ uri => $callback_uri, retry => 1, });
+  my $callback = Murakumo_Node::CLI::Job::Callback->new({ uri => $callback_uri, retry_by_mail => 1, });
 
   local $@;
   eval {
@@ -186,7 +185,6 @@ sub boot2 {
         memory => $vps_params->{memory},
         cpu    => $vps_params->{cpu_number},
         clock  => $vps_params->{clock},
-    
       };
 
       exists $vps_params->{cdrom_path}
@@ -222,54 +220,20 @@ sub boot2 {
 
   require Sys::Hostname;
   my $my_nodename = Sys::Hostname::hostname();
-  my %call_back_params = (
-                            uuid   => $vps_params->{uuid},
-                            result => $result,
-                            node   => $my_nodename,
+  my %callback_params = (
+                            uuid    => $vps_params->{uuid},
+                            result  => $result,
+                            node    => $my_nodename,
+                            message => qq{},
                           );
-  $@ and $call_back_params{error} = $@;
 
-  if (! $callback->call(\%call_back_params)) {
-    critical("callback $callback_uri error eval error:$@ ", Dumper \%call_back_params);
-  }
+  $@ and $callback_params{message} = ref $@ eq q{Sys::Virt::Error}
+                                 ? $@->stringify
+                                 : $@;
+  $callback->set_params( \%callback_params );
 
   return $result;
 
-}
-
-sub boot {
-  my ($self, $args_ref) = @_;
-  my $xml_data = "";
-  my $xml_path_object = file(
-                              $config->{vm_root},
-                              $args_ref->{project_id},
-                              $config->{vm_config_dirname},
-                              $args_ref->{name}.".xml"
-                             );
-  try {
-    $xml_data = $xml_path_object->slurp;
-
-  } catch {
-    warn $xml_path_object->absolute . " read error";
-    return 0;
-  };
-
-  my $xml_ref = $self->parse_xml( $xml_path_object->absolute );
-
-  my @storages;
-  for my $disk ( @{$xml_ref->{domain}->[0]->{devices}->[0]->{disk}} ) {
-    exists $disk->{source}->[0]->{'-file'} or next;
-    push @storages, $disk->{source}->[0]->{'-file'};
-  }
-
-  my @brs;
-  for my $iface ( @{$xml_ref->{domain}->[0]->{devices}->[0]->{interface}} ) {
-    push @brs, $iface->{source}->[0]->{'-bridge'};
-  }
-
-  $self->make_bridge_and_storage_pool({ br => \@brs, storage => \@storages, });
-  
-  $self->conn->create_domain( $xml_data );
 }
 
 sub test { warn __PACKAGE__ . "::test" }
@@ -348,10 +312,7 @@ sub operation {
     $fail = 1;
 
   };
-  # 戻り値がわからないのでとりあえずスキップ
-  # if (! $r) {
-  #   warn "operation $mode error";
-  # }
+
   return $fail == 0;
 }
 
