@@ -35,8 +35,6 @@ sub create {
   dumper($params);
 
   my $disk_param_ref = $params->{disks};
-  my $project_id     = $params->{project_id};
-  # my $job_uuid       = $params->{job_uuid};
   my $reserve_uuid   = $params->{reserve_uuid};
   my $vps_uuid       = $params->{vps_uuid};
 
@@ -62,7 +60,6 @@ sub create {
                                                             });
 
   my %callback_params = (
-                           project_id   => $project_id,
                            reserve_uuid => $reserve_uuid,
                            vps_uuid     => $vps_uuid,
                          );
@@ -85,9 +82,7 @@ sub create {
 
 sub remove {
   my ($self, $params) = @_;
-  warn Dumper $params;
 
-  my $project_id = $params->{project_id};
   my $vps_uuid   = $params->{uuid};
   my $disks      = $params->{disks};
 
@@ -119,7 +114,6 @@ sub remove {
 
   my %callback_params = (
                            uuid         => $vps_uuid,
-                           project_id   => $project_id,
                          );
 
   $callback->set_params( \%callback_params );
@@ -177,12 +171,10 @@ sub clone_for_image {
   warn Dumper $argv;
 
   no strict 'refs';
-  # 前の2つと project_idは必須
+  # org_uuid と dst_hostname は、必須
   my (
        $org_uuid,
-       $project_id, 
        $dst_hostname,
-       # $job_uuid,
        $mac,
        $ip,
        $mask,
@@ -196,9 +188,7 @@ sub clone_for_image {
       )
       = (
           $argv->{org_uuid},
-          $argv->{project_id},
           $argv->{dst_hostname},
-          # $argv->{job_uuid},
           $argv->{mac},
           $argv->{ip},
           $argv->{mask},
@@ -213,25 +203,6 @@ sub clone_for_image {
 
   my $use_public = exists $argv->{public};
 
-  my $template_dirname = $project_id;
-
-  if ($use_public) {
-    $template_dirname = $config->{template_dirname};
-
-  }
-
-  $src_image_path ||= file(
-                           $vm_root,
-                           $template_dirname,
-                           $org_uuid . ".img",
-                          )->absolute;
-
-  $dst_image_path ||= file(
-                         $vm_root,
-                         $project_id,
-                         $dst_uuid . ".img"
-                        )->absolute;
-
   $self->maked_file( $dst_image_path );
 
   $callback_host ||= $config->{callback_host};
@@ -242,8 +213,6 @@ sub clone_for_image {
                                                              });
   my %callback_params = (
                            image_path   => $dst_image_path,
-                           project_id   => $project_id,
-                           # job_uuid     => $ob_uuid, # job uuid を切り離す
                            reserve_uuid => $reserve_uuid,
                            vps_uuid     => $dst_uuid,
                          );
@@ -251,13 +220,6 @@ sub clone_for_image {
 
   local $@;
   eval {
-
-    if (! $project_id) {
-      croak "project id is require";
-    }
-
-    # NECのディスクを操作するため、処理を切り離すように別クラスにする
-    # 失敗したら例外を出すこと！
 
     require Murakumo_Node::CLI::Libvirt::Storage;
     my $libvirt_storage = Murakumo_Node::CLI::Libvirt::Storage->new;
@@ -339,13 +301,8 @@ sub make_image_cloning {
 
   _path_make( $dst_image_path );
 
-  # make disk
-  # create_disk_cmd = "#{qemu_img} create -b #{org_disk_path} -f #{org_disk_type} #{new_disk_path}"
-  # my $cmd = "$qemu_img_cmd create -b $org_image_path -f qcow2 $dst_image_path";
-
   # とりあえず、cp...
   my $cmd = "cp --sparse=auto $org_image_path $dst_image_path";
-  # my $cmd = "cp -a $org_image_path $dst_image_path";
 
   warn $cmd;
   my $r = system $cmd;

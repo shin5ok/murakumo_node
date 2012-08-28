@@ -36,7 +36,6 @@ sub index :Path :Args(0) {
 
 sub boot :Local {
   my ( $self, $c ) = @_;
-  # goto &boot_from_xmlfile;
   return $c->forward( 'boot_from_json' );
 }
 
@@ -46,7 +45,6 @@ sub boot_from_json :Local {
   my $body   = $c->request->body;
   my $params = decode_json <$body>;
 
-  warn Dumper $params;
   {
     no strict 'refs';
     for my $param_name ( qw( job_uuid uuid ) ) {
@@ -139,12 +137,10 @@ sub create :Local {
   my $job_model = $c->model('Job');
 
   my $r = $job_model->register('VPS::Disk::Create', $params);
-  warn $r;
+
   if ($r) {
     $c->stash->{result} = 1;
   };
-
-  # return $c->forward( $c->view('JSON') );
 
 }
 
@@ -179,8 +175,6 @@ sub migration :Local {
     $c->stash->{result} = 1;
   };
 
-  # return $c->forward( $c->view('JSON') );
-
 }
 
 sub clone :Local {
@@ -199,10 +193,9 @@ sub clone :Local {
     my @param_names = qw(
                           org_uuid
                           dst_uuid
-                          project_id
                          );
 
-    # 必須は dst_name、org_name、project_id
+    # 必須は dst_name、org_name
     # 任意に、dst_image_path、org_iamge_path、xml_path
     for my $name ( @param_names ) {
       exists $params->{$name}
