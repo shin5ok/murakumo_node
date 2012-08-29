@@ -191,12 +191,11 @@ sub clone :Local {
     no strict 'refs';
 
     my @param_names = qw(
-                          org_uuid
+                          src_uuid
                           dst_uuid
+                          dst_image_path
                          );
 
-    # 必須は dst_name、org_name
-    # 任意に、dst_image_path、org_iamge_path、xml_path
     for my $name ( @param_names ) {
       exists $params->{$name}
         or croak "*** $name is empty";

@@ -75,13 +75,13 @@ my @write_files_content_array = (
                  # SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="78:2b:cb:2a:18:31", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
 
                  my $old_mac;
-                 __LINE__:
+                 __FILE_LINE__:
                  for my $line ( split /\n/, $content ) {
                    $line =~ /^\s* #/x 
-                     or next __LINE__;
+                     or next __FILE_LINE__;
 
                    $line =~ / NAME \s* \= \s* \"? eth0 \"? /x
-                     or next __LINE__;
+                     or next __FILE_LINE__;
                    ($old_mac) =
                      $line =~ /
                                  \s*ATTR\{address\}
@@ -89,7 +89,7 @@ my @write_files_content_array = (
                                  \"([^\"]+)\"   
                                /x;
 
-                      last __LINE__;
+                      last __FILE_LINE__;
 
                  }
 
@@ -144,7 +144,7 @@ FILESYSTEMS: for my $dev ( keys %s ) {
   $h->mount( $dev, '/' );
   if ($h->exists( '/etc' )) {
 
-    __WRITE__FILES__:
+    __WRITE_FILES__:
     for my $v ( @write_files_content_array ) {
       if ( exists $v->{content} ) {
         $h->write( $v->{file}, $v->{content} );
@@ -161,7 +161,7 @@ FILESYSTEMS: for my $dev ( keys %s ) {
           };
           if ($@) {
             $failure = 1;
-            next __WRITE__FILES__;
+            next __WRITE_FILES__;
           }
         }
       }

@@ -33,8 +33,6 @@ sub _connect {
     # とりあえず自分のunixドメインのみに接続する
     # livemigrationとかで、他のサーバに接続する必要がある場合は、
     # 接続先を指定できるようにするか、別クラスで対応する
-    # このクラスを継承して、_connect() をオーバーライドすると
-    # 楽かも
     if (! $conn or ref $conn ne 'Sys::Virt') {
       warn "libvirt connect";
       $conn = Sys::Virt->new;

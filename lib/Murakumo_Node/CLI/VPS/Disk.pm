@@ -171,9 +171,9 @@ sub clone_for_image {
   warn Dumper $argv;
 
   no strict 'refs';
-  # org_uuid と dst_hostname は、必須
+  # src_uuid と dst_hostname は、必須
   my (
-       $org_uuid,
+       $src_uuid,
        $dst_hostname,
        $mac,
        $ip,
@@ -187,7 +187,7 @@ sub clone_for_image {
        $set_network,    # option
       )
       = (
-          $argv->{org_uuid},
+          $argv->{src_uuid},
           $argv->{dst_hostname},
           $argv->{mac},
           $argv->{ip},
@@ -294,7 +294,7 @@ sub maked_file {
 }
 
 sub make_image_cloning {
-  my ($self, $org_image_path, $dst_image_path) = @_;
+  my ($self, $src_image_path, $dst_image_path) = @_;
 
   # 既に作成するファイルがある場合はエラー
   -f $dst_image_path and croak "$dst_image_path is already exist";
@@ -302,7 +302,7 @@ sub make_image_cloning {
   _path_make( $dst_image_path );
 
   # とりあえず、cp...
-  my $cmd = "cp --sparse=auto $org_image_path $dst_image_path";
+  my $cmd = "cp --sparse=auto $src_image_path $dst_image_path";
 
   warn $cmd;
   my $r = system $cmd;
