@@ -119,15 +119,12 @@ sub add {
   if (exists $api_result->{result} and $api_result->{result} == 1) {
     no strict 'refs';
 
-    warn Dumper $api_result;
     my $data = $api_result->{data};
 
     # ディレクトリを作成
     -e $data->{mount_path} or mkpath $data->{mount_path}, { verbose => 1 };
 
     my $xml_data = Murakumo_Node::CLI::Libvirt::XML->new->create_storage_xml( $data );
-    warn "--- ", __PACKAGE__ , " ---";
-    warn $xml_data;
 
     if (! $self->conn->create_storage_pool( $xml_data )) {
       croak "*** storage pool $uuid create error";

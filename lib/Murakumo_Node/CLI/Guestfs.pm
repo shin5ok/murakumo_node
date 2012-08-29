@@ -29,8 +29,6 @@ sub set_network {
   my ($drive, $mac, $ip, $mask, $gw, $hostname)
     = ($p->{drive}, $p->{mac}, $p->{ip}, $p->{mask}, $p->{gw}, $p->{hostname});
 
-  warn Dumper $p;
-
   my $command_t = "%s --drive %s --mac %s --ip %s --mask %s --gw %s";
   if ($hostname) {
      $command_t = "%s --drive %s --mac %s --ip %s --mask %s --gw %s --hostname %s";
