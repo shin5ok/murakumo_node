@@ -5,6 +5,7 @@ use LWP::UserAgent;
 use JSON;
 use HTTP::Request::Common qw(POST GET);
 use Data::Dumper;
+use Sys::Hostname;
 use Carp;
 
 
@@ -62,8 +63,8 @@ sub call {
 
   no strict 'refs';
   my $callback_func = sub {
-    my $arg_ref = shift;
-    my ($uri, $params) = @$arg_ref;
+    my $arg_ref          = shift;
+    my ( $uri, $params ) = @$arg_ref;
     require Murakumo_Node::CLI::Remote_JSON_API;
     my $api = Murakumo_Node::CLI::Remote_JSON_API->new;
 
@@ -88,27 +89,24 @@ sub call {
     no strict 'refs';
     if ( ! $self->{not_retry} ) {
 
-      require Murakumo_Node::CLI::Job;
-      require Murakumo_Node::CLI::Utils;
+      my $utils   = Murakumo_Node::CLI::Utils->new;
+      my $config  = $utils->config;
+      my $api_key = $utils->get_api_key;
+      my $uri = URI->new ( $self->{uri} );
+      $uri->query_form(
+                        name      => hostname(),
+                        key       => $api_key->{api_key},
+                        node_uuid => $api_key->{node_uuid},
+                      );
 
-      my $config = Murakumo_Node::CLI::Utils->config;
-      my $job_model = Murakumo_Node::CLI::Job->new({ db_path => $config->{retry_db_path} });
-      $job_model->register('Retry', { func => $callback_func, func_args => [ $self->{uri}, $params ] });
+      # メールのapiは権限の問題で、api のkeyを読めないので事前につけておく
+      my $params_content = do { encode_json $params };
+
+      require Murakumo_Node::CLI::Mail_API;
+      Murakumo_Node::CLI::Mail_API->new ( $config->{mail_api_to} )
+                                  ->post( $uri, $params_content );
 
     }
-
-    # if ($self->{retry_by_mail}) {
-
-    #   my $data = $params;
-
-    #   # POST で接続できなかったら、メールで再試行
-    #   # 将来、メッセージキューに置き換える
-    #   my $config = Murakumo_Node::CLI::Utils->new->config;
-    #   require Murakumo_Node::CLI::Mail_API;
-    #   Murakumo_Node::CLI::Mail_API->new ( $config->{mail_api_to} )
-    #                               ->post( $self->{uri}, $data, { type => "json" } );
-
-    # }
   }
 
   # warn sprintf "%s %s >>> %s : %s (%s)", __PACKAGE__,

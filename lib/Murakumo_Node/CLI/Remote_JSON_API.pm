@@ -20,7 +20,12 @@ our $wwwua  = do { my $ua = LWP::UserAgent->new; $ua->timeout(10); $ua };
 sub new {
   my $class   = shift;
   my $api_uri = shift;
-  my $query   = shift || undef; # uri に 追加するquery
+  my $query   = shift || {};
+
+  my $uri_query = +{URI->new( $api_uri )->query_form};
+  # 既存のuri の query を 引数で上書き
+  %$query = ( %$uri_query, %$query );
+
   return bless +{
            api_uri => $api_uri,
            query   => $query,
@@ -44,25 +49,17 @@ sub get {
 
   my $query = $self->query;
   if (! exists $query->{key}) {
-
     my $key = $utils->get_api_key;
-    my $api_valid_query = {
+    $query = {
       name      => hostname(),
       key       => $key->{api_key},
       node_uuid => $key->{node_uuid},
     };
-
-    warn Dumper $param;
-
-    %$param = ( %$param, %{$api_valid_query} );
-    warn Dumper $param;
-
   }
 
-  $uri->query_form(%$param);
+  $uri->query_form( %{$query} );
 
   my $response = $wwwua->get( $uri );
-  warn $uri;
 
   if ($response->is_success) {
     return $response;
@@ -74,7 +71,7 @@ sub get {
 
 sub json_post {
 
-  my ($self, $uri_path, $params) = @_;
+  my ($self, $uri_path, $params, $option_ref) = @_;
   $uri_path ||= "";
 
   no strict 'refs';
@@ -95,6 +92,7 @@ sub json_post {
       node_uuid => $key->{node_uuid},
     };
   }
+
   $uri->query_form( %{$query} );
 
   warn "----- json_post ------------------------";
@@ -102,20 +100,22 @@ sub json_post {
   warn Dumper $params;
   warn "----------------------------------------";
 
+  if (! exists $option_ref->{encoded}) {
+    eval {
+      $params = encode_json $params;
+    }
+  }
+
   my $request = HTTP::Request->new( 'POST', $uri );
   $request->header('Content-Type' => 'application/json');
-  $request->content( encode_json $params );
+  $request->content( $params );
 
-  my $response = $wwwua->request( $request );
-  if ($response->is_success) {
-    return $response;
-
-  } else {
-    warn "*** http request error for $uri";
-    warn $response->content;
-    return undef;
-
-  }
+  my $response;
+  eval {
+    $response = $wwwua->request( $request );
+    warn $response->code;
+  };
+  return $response;
 
 }
 
@@ -129,16 +129,12 @@ sub post {
 
   my $request = POST $uri, [ %$params ];
   my $response = $wwwua->request( $request );
-  warn "----- post ---------------";
-  warn $response->content;
-  warn "--------------------------";
+  # warn "----- post ---------------";
+  # warn $response->content;
+  # warn "--------------------------";
 
-  if ($response->is_success) {
-    return $response;
-  } else {
-    warn $response->code;
-    return undef;
-  }
+  # warn $response;
+  return $response;
 
 }
 

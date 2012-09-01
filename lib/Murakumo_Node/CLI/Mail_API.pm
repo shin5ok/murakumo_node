@@ -2,6 +2,7 @@ use warnings;
 use strict;
 package Murakumo_Node::CLI::Mail_API;
 use Carp;
+use JSON;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
@@ -17,49 +18,24 @@ sub new {
   }
   bless {
     api_to => $to,
-    type   => 'json', # ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆJSON
   }, $class;
 }
 
 sub post {
+  # HTTP POST¤Î¤ß¥µ¥Ý¡¼¥È
   my ($self, $uri, $data, $option) = @_;
-
-  my $encoded_data = "";
-  my $error_string = "";
-
-  if ($option->{type} eq 'xml') {
-    local $@;
-    eval qq{ use XML::TreePP; };
-    eval {
-      $encoded_data = XML::TreePP->new( force_array => '*' )->parse( $data );
-    };
-    $error_string .= $@;
-  } else {
-    local $@;
-    eval qq{ use JSON; };
-    eval {
-      $encoded_data = JSON::encode_json $data;
-    };
-    $error_string .= $@;
-  }
 
   my $sender = exists $option->{sender}
              ? $option->{sender}
              : exists $ENV{LOGNAME}
              ? $ENV{LOGNAME}
              : "root";
-  my $method = exists $option->{method}
-             ? $option->{method}
-             : "POST";
 
   open my $pipe, "| /usr/sbin/sendmail -f$sender $self->{api_to}";
-  print {$pipe} "X-API-URI: $uri\n";
-  print {$pipe} "X-API-METHOD: $method\n";
-  print {$pipe} "\n";
-  print {$pipe} $data;
+    print {$pipe} "$config->{mail_extra_uri_header_name}: $uri\n";
+    print {$pipe} "\n";
+    print {$pipe} $data;
   close $pipe;
-
-  return ! $error_string;
 
 }
 
