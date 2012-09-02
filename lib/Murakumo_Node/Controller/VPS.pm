@@ -49,18 +49,15 @@ sub boot_from_json :Local {
     no strict 'refs';
     for my $param_name ( qw( job_uuid uuid ) ) {
       exists $params->{$param_name}
-        or croak "*** $param_name is missing...";
+        or $c->detach("/stop_error", ["*** $param_name is missing..."]);
     }
   }
-
-  # job uuid をセット
-  # my $param_ref = { job_uuid => $params->{job_uuid} };
 
   local $@;
 
   if ($@) {
-    warn "EVAL ERROR: ", $@;
     $c->stash->{message} = $@;
+    $c->log->warn( $c->stash->{message} );
 
   } else {
 
@@ -74,13 +71,12 @@ sub boot_from_json :Local {
 
   }
 
-  # return $c->forward( $c->view('JSON') );
-
 }
 
 sub shutdown :Local {
   my ( $self, $c ) = @_;
   $c->forward('_operation', ['VPS::Shutdown']);
+
 }
 
 sub terminate :Local {
@@ -101,10 +97,12 @@ sub _operation :Private {
 
   my $job_model = $c->model('Job');
 
+  $c->log->info("job register: $class " . Dumper $params);
+
   my $r = $job_model->register($class, $params);
   if ($r) {
     $c->stash->{result} = 1;
-  };
+  }
 
 }
 
@@ -125,6 +123,8 @@ sub cdrom :Local {
     $c->stash->{result}  = 1;
   }
 
+  $c->log->info( $c->stash->{message} );
+
 }
 
 sub create :Local {
@@ -140,7 +140,8 @@ sub create :Local {
 
   if ($r) {
     $c->stash->{result} = 1;
-  };
+    $c->log->info("vps create job " . Dumper $params);
+  }
 
 }
 
@@ -158,7 +159,7 @@ sub remove :Local {
     $c->stash->{result} = 1;
   };
 
-  # return $c->forward( $c->view('JSON') );
+  $c->log->info("vps remove job " . Dumper $params);
 
 }
 
@@ -174,6 +175,8 @@ sub migration :Local {
   if ($r) {
     $c->stash->{result} = 1;
   };
+
+  $c->log->info("vps migration job " . Dumper $params);
 
 }
 
@@ -206,6 +209,7 @@ sub clone :Local {
     my $r = $job_model->register('VPS::Clone', $params);
     if ($r) {
       $c->stash->{result} = 1;
+      $c->log->info("vps clone job " . Dumper $params);
     };
   } else {
     $c->stash->{error} = $@;

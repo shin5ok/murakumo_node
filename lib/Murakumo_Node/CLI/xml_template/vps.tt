@@ -7,8 +7,8 @@
   <vcpu>[% cpu -%]</vcpu>
   <os>
     <type arch="x86_64" machine="rhel6.2.0">hvm</type>
-    <boot dev="cdrom"/>
     <boot dev="hd"/>
+    <boot dev="cdrom"/>
     <bootmenu enable="no"/>
   </os>
   <features>

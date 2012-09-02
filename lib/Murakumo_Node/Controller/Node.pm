@@ -36,8 +36,7 @@ sub setup_node :Local {
   my $body = $c->request->body;
   my $params = decode_json <$body>;
 
-  warn "--- setup_node ---";
-  warn Dumper $params;
+  $c->log->info("setup_node called: " . Dumper $params);
 
   my $br_ref   = $params->{br};
   my $disk_ref = $params->{storage};
@@ -45,15 +44,9 @@ sub setup_node :Local {
   my $vps_model = $c->model('VPS');
   $vps_model->make_bridge_and_storage_pool( { br => $br_ref, storage => $disk_ref } );
 
+  $c->log->info( Dumper +{ br => $br_ref, storage => $disk_ref } );
+
   $c->stash->{result} = 1;
-
-}
-
-sub test :Local {
-
-  my ($self, $c) = @_;
-  my $vps_model = $c->model('VPS');
-  $vps_model->test;
 
 }
 

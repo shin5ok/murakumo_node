@@ -26,19 +26,6 @@ The root page (/)
 
 =cut
 
-# sub index :Path :Args(0) {
-#     my ( $self, $c ) = @_;
-# 
-#     # Hello World
-#     $c->response->body( $c->welcome_message );
-# }
-
-sub stop_test :Local {
-  my ( $self, $c ) = @_;
-  $c->detach("/stop_error", ["############ error ############"]);
-
-}
-
 sub stop_error :Private {
   my ( $self, $c ) = @_;
   my $error_message = $c->request->args->[0];
@@ -48,6 +35,8 @@ sub stop_error :Private {
 
   if (defined $error_message) {
     $c->stash->{message} = $error_message;
+    $c->log->warn( $c->stash->{message} );
+
   }
 
   return;
@@ -72,10 +61,12 @@ sub end : ActionClass('RenderView') {
     if ($@) {
       $c->stash->{result}  = "0";
       if (! exists $c->stash->{message}) {
-        warn "--- default error -------------";
+        $c->log->warn("--- default error -------------");
         $c->stash->{message} = $@;
+
       }
       return;
+
     }
 
     if ((my @errors = @{$c->error}) > 0) {
