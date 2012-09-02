@@ -22,17 +22,6 @@ fi
 job_init_filename=`basename $job_init`
 /sbin/chkconfig $job_init_filename on
 
-retry_init="/etc/init.d/murakumo_node_retry"
-if ! test -e $retry_init;
-then
-  echo "$retry_init make"
-  cd /etc/init.d/
-  ln -s /home/smc/murakumo_node/bin/Murakumo_Node_retry.init $retry_init
-  chmod +x $retry_init
-fi
-retry_init_filename=`basename $retry_init`
-/sbin/chkconfig $retry_init_filename on
-
 submit_init="/etc/init.d/murakumo_node_submit"
 if ! test -e $submit_init;
 then
@@ -48,14 +37,10 @@ echo "#########################################"
 $job_init stop
 $job_init start
 
-$retry_init stop
-$retry_init start
-
 $submit_init stop
 $submit_init start
 
 $api_init stop
 $api_init start
 echo "#########################################"
-
 

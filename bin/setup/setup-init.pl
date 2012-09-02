@@ -1,9 +1,12 @@
 #!/usr/bin/murakumo-perl
 use strict;
 use warnings;
+use Data::Dumper;
 use FindBin;
+use File::Spec;
 
-my @inits = glob "$FindBin::Bin/*.init";
+my @inits = glob "$FindBin::Bin/../*.init";
+@inits = map { File::Spec->rel2abs($_) } @inits;
 warn "murakumo_node init script setup...";
 sleep 2;
 
