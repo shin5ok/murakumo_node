@@ -114,7 +114,7 @@ sub add {
     }
   }
 
-  my $api_response = Murakumo_Node::CLI::Remote_JSON_API->new->get('/storage/info/', { uuid => $uuid });
+  my $api_response = Murakumo_Node::CLI::Remote_JSON_API->new->get("/storage/info/", { uuid => $uuid });
   my $api_result   = decode_json $api_response->content;
   if (exists $api_result->{result} and $api_result->{result} == 1) {
     no strict 'refs';

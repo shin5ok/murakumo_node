@@ -23,8 +23,11 @@ sub new {
   my $query   = shift || {};
 
   my $uri_query = +{URI->new( $api_uri )->query_form};
+
   # 既存のuri の query を 引数で上書き
-  %$query = ( %$uri_query, %$query );
+  if (keys %$uri_query > 0) {
+    %$query = ( %$uri_query, %$query );
+  }
 
   return bless +{
            api_uri => $api_uri,
@@ -35,26 +38,34 @@ sub new {
 sub query {
   my $self  = shift;
   my $query = shift;
+
   if ($query) {
+    if (ref $self->{query} eq 'HASH') {
+      %$query = (%{$self->{query}}, %$query);
+    }
     $self->{query} = $query;
   }
+
   return $self->{query};
+
 }
 
 sub get {
-  my ($self, $uri_path, $param) = @_;
+  my ($self, $uri_path, $params) = @_;
   no strict 'refs';
   my $api_uri = $self->{api_uri} || $config->{api_uri};
   my $uri = URI->new( $api_uri ."/". $uri_path );
 
-  my $query = $self->query;
+  my $query = $self->query( $params );
+
   if (! exists $query->{key}) {
     my $key = $utils->get_api_key;
-    $query = {
+    my %new_query = (
       name      => hostname(),
       key       => $key->{api_key},
       node_uuid => $key->{node_uuid},
-    };
+    );
+    %$query = (%$query, %new_query);
   }
 
   $uri->query_form( %{$query} );
@@ -83,22 +94,18 @@ sub json_post {
     $uri = URI->new( $api_uri ."/". $uri_path );
   }
 
-  my $query = $self->query;
+  my $query = $self->query( $params );
   if (! exists $query->{key}) {
     my $key = $utils->get_api_key;
-    $query = {
+    my %new_query = (
       name      => hostname(),
       key       => $key->{api_key},
       node_uuid => $key->{node_uuid},
-    };
+    );
+    %$query = (%$query, %new_query);
   }
 
   $uri->query_form( %{$query} );
-
-  warn "----- json_post ------------------------";
-  warn $uri;
-  warn Dumper $params;
-  warn "----------------------------------------";
 
   if (! exists $option_ref->{encoded}) {
     eval {
