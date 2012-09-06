@@ -311,5 +311,4 @@ sub make_image_cloning {
   return 1;
 
 }
-
 1;

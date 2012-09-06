@@ -33,14 +33,5 @@ fi
 submit_init_filename=`basename $submit_init`
 /sbin/chkconfig $submit_init_filename on
 
-echo "#########################################"
-$job_init stop
-$job_init start
-
-$submit_init stop
-$submit_init start
-
-$api_init stop
-$api_init start
-echo "#########################################"
+ls -l /etc/init.d/murakumo_*
 

@@ -94,7 +94,7 @@ sub json_post {
     $uri = URI->new( $api_uri ."/". $uri_path );
   }
 
-  my $query = $self->query( $params );
+  my $query = $self->query;
   if (! exists $query->{key}) {
     my $key = $utils->get_api_key;
     my %new_query = (
