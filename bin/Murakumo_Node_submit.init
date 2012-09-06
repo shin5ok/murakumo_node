@@ -87,6 +87,7 @@ sub post_state {
   my $node_ref = _gathering_node();
 
   $node_ref->{name} = $node;
+  $node_ref->{uuid} = $key->{node_uuid};
   $node_ref->{cpu_vps_used} = $cpu_vps_used;
   $node_ref->{vps_number}   = scalar @$vps_ref;
   $node_ref->{cpu_available} = $node_ref->{cpu_total} - $cpu_vps_used;
