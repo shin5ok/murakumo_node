@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Murakumo_Node::CLI::Utils;
+package Murakumo_Node::CLI::Utils 0.05;
 use URI;
 use JSON;
 use Data::Dumper;
@@ -11,10 +11,8 @@ use Config::General;
 use Sys::Syslog qw(:DEFAULT setlogsock);
 use IPC::Open2;
 
-our $VERSION = q(0.0.3);
-
-our $config_path   = q{/home/smc/murakumo_node/murakumo_node.conf};
-our $root_itemname = q{root};
+our $config_path     = q{/home/smc/murakumo_node/murakumo_node.conf};
+our $log_config_path = qq{$FindBin::Bin/../log4perl.conf};
 
 sub import {
   my $caller = caller;
@@ -22,7 +20,7 @@ sub import {
   *{"${caller}::critical"} = \&critical;
   *{"${caller}::command"}  = \&command;
   *{"${caller}::dumper"}   = \&dumper;
-
+  *{"${caller}::logger"}   = \&logger;
 }
 
 sub new {
@@ -128,6 +126,15 @@ sub get_api_key {
   my $ref = decode_json $api_key_text;
   return $ref;
 
+}
+
+
+sub logger {
+  Log::Log4perl->init( $log_config_path );
+  my $log = Log::Log4perl->get_logger;
+  my $level      = shift;
+  my $log_string = shift;
+  $log->$level( $log_string );
 }
 
 1;
