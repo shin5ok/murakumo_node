@@ -146,24 +146,43 @@ sub boot2 {
 
     for my $disk ( @{$vps_params->{disks}} ) {
 
+      my $r = +{};
+
       my $disk_number    = \$virtio_disk_number;
       my $blockname_char = \@virtio_blockname_char;
       my $disk_prename   = "vd";
       my $driver         = 'virtio';
 
+      my $controller;
       if ( exists $disk->{driver} and $disk->{driver} ne 'virtio' ) {
         $disk_prename   = "hd";
         $blockname_char = \@nonvirtio_blockname_char;
         $disk_number    = \$nonvirtio_disk_number;
         $driver         = 'ide';
+
+        # 0, 0 は cdromで使っています
+        my ($bus, $unit) = $$disk_number == 0
+                         ? (0, 1)
+                         : $$disk_number == 1
+                         ? (1, 0)
+                         : $$disk_number == 2
+                         ? (1, 1)
+                         : (undef, undef)
+                         ;
+
+        if (! defined $bus and ! defined $unit) {
+          croak "*** disk device ide no more available";
+        }
+
+        $controller = { bus => $bus, unit => $unit };
       }
 
-      my $r = {
+      $r = {
         image_path => $disk->{image_path},
         devname    => (sprintf "%s%s", $disk_prename, $blockname_char->[$$disk_number]),
         driver     => $driver,
       };
-      warn Dumper $r;
+      $controller and $r->{controller} = $controller;
       
       my $xml_data = $x->create_disk_xml( $r );
       

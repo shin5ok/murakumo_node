@@ -2,4 +2,7 @@
       <driver name='qemu' type='raw' cache='writeback'/>
       <source file='[% image_path -%]'/>
       <target dev='[% devname -%]' bus='[% driver -%]'/>
+[% IF driver == "ide" -%]
+      <address type='drive' controller='0' bus='[% controller.bus -%]' unit='[% controller.unit -%]'/>
+[% END -%]
     </disk>

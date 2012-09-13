@@ -11,8 +11,9 @@ use Config::General;
 use Sys::Syslog qw(:DEFAULT setlogsock);
 use IPC::Open2;
 
-our $config_path     = qq{$FindBin::Bin/../murakumo_node.conf};
-our $log_config_path = qq{$FindBin::Bin/../log4perl.conf};
+use FindBin;
+our $config_path     = qq{/home/smc/murakumo_node/murakumo_node.conf};
+our $log_config_path = qq{/home/smc/murakumo_node/log4perl.conf};
 
 sub import {
   my $caller = caller;
