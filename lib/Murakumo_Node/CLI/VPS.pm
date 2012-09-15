@@ -72,12 +72,12 @@ sub domain_obj {
 
 sub boot2 {
   my ($self, $args_ref) = @_;
-  warn Dumper $args_ref;
 
   my $result = 0;
 
-  my $vps_params = $args_ref->{vps_params};
   no strict 'refs';
+  my $vps_params    = $args_ref->{vps_params};
+  my $clean_traffic = $args_ref->{clean_traffic} || 0;
   {
     my @require_keys = qw(
       disks     
@@ -124,13 +124,14 @@ sub boot2 {
                  : sprintf "br%04d", $interface->{vlan_id};
 
       my $r = {
-        bridge  => $bridge,
-        mac     => $interface->{mac},
-        driver  => $interface->{driver},
-        ip      => $interface->{ip}->{ip} || 0,
-        vlan_id => $interface->{vlan_id},
+        bridge        => $bridge,
+        mac           => $interface->{mac},
+        driver        => $interface->{driver},
+        ip            => $interface->{ip}->{ip} || 0,
+        vlan_id       => $interface->{vlan_id},
+        clean_traffic => $clean_traffic,
       };
-      
+
       my $xml_data = $x->create_interface_xml( $r );
       
       push @interfaces, $xml_data;
