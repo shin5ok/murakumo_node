@@ -41,8 +41,7 @@ my @write_files_content_array = (
   {
     file    => "/etc/sysconfig/network",
     code    => sub {
-                 my ($content, $opt_ref) = @_;
-                 my $hostname = $opt_ref->{hostname};
+                 my ($content) = @_;
 
                  my $old_hostname = "";
                  if (($old_hostname) = $content =~ /^HOSTNAME\s*\=\s*(\S+)/msi) {
@@ -52,10 +51,14 @@ my @write_files_content_array = (
                    $content .= "HOSTNAME=cloned\n";
                  }
 
-                 if ($content =~ /^(GATEWAY\s*\=\s*\S+)/i) {
-                   $content =~ s/$1/GATEWAY=$gw/;
+                 if ($content =~ /^(GATEWAY\s*\=\s*)(\S+)/sim) {
+                   if ($2 ne $gw) {
+                     $content =~ s/$1$2/GATEWAY=$gw/;
+                   }
+
                  } else {
                    $content .= "GATEWAY=$gw\n";
+
                  }
 
                  return $content;
@@ -68,8 +71,8 @@ my @write_files_content_array = (
   {
     file    => "/etc/udev/rules.d/70-persistent-cd.rules",
     code    => sub {
-                 my ($content, $opt_ref) = @_;
-                 my $new_mac = $opt_ref->{mac};
+                 my ($content) = @_;
+                 my $new_mac = $mac;
                  $new_mac or return;
 
                  # SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="78:2b:cb:2a:18:31", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
@@ -104,8 +107,8 @@ my @write_files_content_array = (
   {
     file    => "/etc/sysconfig/hwconf",
     code    => sub {
-                 my ($content, $opt_ref) = @_;
-                 my $new_mac = $opt_ref->{mac};
+                 my ($content) = @_;
+                 my $new_mac = $mac;
                  $new_mac or return;
 
                  my ($eth0_part)
