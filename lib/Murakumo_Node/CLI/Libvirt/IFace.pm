@@ -45,11 +45,23 @@ sub make_br_and_vlan {
     my ($vlan_id_raw) = $br =~ /(\d+)$/;
     my $vlan_id = int $vlan_id_raw;
 
-    my $vlan_nic = sprintf "%s.%d", $config->{user_nic}, $vlan_id;
+    my $nic = $config->{user_nic};
+    if (exists $config->{option_nic}
+          and exists $config->{option_nic_use_vlan_id_min}
+            and exists $config->{option_nic_use_vlan_id_max}) {
+
+      if ($config->{option_nic_use_vlan_id_min} <= $vlan_id
+               and $vlan_id <= $config->{option_nic_use_vlan_id_max}) {
+           $nic = $config->{option_nic}
+      }
+
+    }
+
+    my $vlan_nic = sprintf "%s.%d", $nic, $vlan_id;
     my $vl_f = file("/proc", "net", "vlan", $vlan_nic);
 
     if (! -e $vl_f->absolute) {
-      my $command = "/sbin/vconfig add $config->{user_nic} $vlan_id";
+      my $command = "/sbin/vconfig add $nic $vlan_id";
       warn $command;
       my $r = command( $command );
       if (! $r) {
@@ -99,7 +111,7 @@ sub make_br_and_vlan {
     #   # libvirt の iface に登録
     #   require Murakumo_Node::CLI::Libvirt::IFace;
     #   my $iface_args_ref = {
-    #     nic      => $config->{user_nic},
+    #     nic      => $nic,
     #     bridge   => $br,
     #     vlan_nic => $vlan_nic,
     #     vlan_id  => $vlan_id,

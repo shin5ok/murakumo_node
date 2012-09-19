@@ -248,8 +248,8 @@ sub boot2 {
                           );
 
   $@ and $callback_params{message} = ref $@ eq q{Sys::Virt::Error}
-                                 ? $@->stringify
-                                 : $@;
+                                   ? $@->stringify
+                                   : $@;
   $callback->set_params( \%callback_params );
 
   return $result;
