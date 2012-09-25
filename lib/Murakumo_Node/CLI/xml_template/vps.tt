@@ -22,6 +22,11 @@
   <on_crash>destroy</on_crash>
   <devices>
     <emulator>/usr/libexec/qemu-kvm</emulator>
+[% FOREACH disk = disks -%]
+[% disk -%]
+[% END -%]
+    <controller type="ide" index="0">
+    </controller>
     <disk type="file" device="cdrom">
       <driver name="qemu" type="raw"/>
       [% IF cdrom_path -%]
@@ -31,11 +36,6 @@
       <readonly/>
       <address type='drive' controller='0' bus='0' unit='0'/>
     </disk>
-[% FOREACH disk = disks -%]
-[% disk -%]
-[% END -%]
-    <controller type="ide" index="0">
-    </controller>
 [% FOREACH interface = interfaces -%]
 [% interface -%]
 [% END -%]

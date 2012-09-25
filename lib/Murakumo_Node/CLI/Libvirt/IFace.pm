@@ -36,12 +36,12 @@ sub add {
 
 
 sub make_br_and_vlan {
-  warn "--- make_br_and_vlan";
+
   my ($self, @brs) = @_;
 
   my $ip_link = qx{/sbin/ip link show};
+
   for my $br ( @brs ) {
-    warn "try $br";
     my ($vlan_id_raw) = $br =~ /(\d+)$/;
     my $vlan_id = int $vlan_id_raw;
 
@@ -118,6 +118,7 @@ sub make_br_and_vlan {
     #   };
     #   $self->add( $iface_args_ref );
     # }
+
 
   }
 

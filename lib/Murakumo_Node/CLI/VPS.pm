@@ -263,13 +263,14 @@ sub make_bridge_and_storage_pool {
   warn "make_bridge_and_storage_pool";
   warn Dumper $hash_ref;
 
+  my $fail_count = 0;
+
   if (exists $hash_ref->{br}) {
     require Murakumo_Node::CLI::Libvirt::IFace;
     my $libvirt_iface = Murakumo_Node::CLI::Libvirt::IFace->new;
     for my $br ( @{$hash_ref->{br}} ) {
-
-      # $libvirt_iface->add( $br );
-      $libvirt_iface->make_br_and_vlan( $br );
+      $libvirt_iface->make_br_and_vlan( $br )
+        or $fail_count++;
     }
   }
 
@@ -277,10 +278,16 @@ sub make_bridge_and_storage_pool {
     require Murakumo_Node::CLI::Libvirt::Storage;
     my $libvirt_storage = Murakumo_Node::CLI::Libvirt::Storage->new;
     for my $storage_path ( @{$hash_ref->{storage}} ) {
-    warn $storage_path;
-      $libvirt_storage->add_by_path( $storage_path );
+      if (! $libvirt_storage->add_by_path( $storage_path )) {
+        logger "add_by_path $storage_path failure";
+        $fail_count++;
+        next;
+      }
     }
   }
+
+  return $fail_count == 0;
+
 }
 
 sub parse_xml {

@@ -50,13 +50,19 @@ sub add_by_path {
   warn "storage_path : $storage_path";
 
   # 先頭から、最初のuuidっぽい文字列を取得
-  my ($storage_uuid) = $storage_path =~ / (
+  my ($storage_uuid) = $storage_path =~ m{ / (
                                              [0-9a-z]{8} \-
                                              [0-9a-z]{4} \-
                                              [0-9a-z]{4} \-
                                              [0-9a-z]{4} \-
                                              [0-9a-z]{12}
-                                           ) /xoms;
+                                           ) / }xoms;
+
+  if (! $storage_uuid ) {
+    logger "*** like uuid get from $storage_path is failure";
+    return 0;
+  }
+
   return $self->add( $storage_uuid );
 
 }

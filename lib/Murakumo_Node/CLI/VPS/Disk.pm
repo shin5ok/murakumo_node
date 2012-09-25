@@ -46,7 +46,11 @@ sub create {
     my $disk_path = $disk_param->{image_path};
     my $disk_size = $disk_param->{size};
 
-    $libvirt_storage->add_by_path( $disk_path );
+    if (! $libvirt_storage->add_by_path( $disk_path )) {
+      logger "add_by_path $disk_path failure";
+      $fail_count++;
+      next;
+    }
 
     # _disk_allocate( $disk_path, $disk_size )
     _disk_make( $disk_path, $disk_size )
@@ -92,10 +96,9 @@ sub remove {
   my $libvirt_storage = Murakumo_Node::CLI::Libvirt::Storage->new;
   for my $disk_path ( @$disks ) {
 
-    warn "add_by_path ( $disk_path )";
     if (! $libvirt_storage->add_by_path( $disk_path )) {
+      logger "add_by_path ( $disk_path ) failure";
       $fail_count++;
-      warn "add_by_path ( $disk_path ) failure";
       next;
     }
 
@@ -224,8 +227,14 @@ sub clone_for_image {
     require Murakumo_Node::CLI::Libvirt::Storage;
     my $libvirt_storage = Murakumo_Node::CLI::Libvirt::Storage->new;
 
-    $libvirt_storage->add_by_path( $src_image_path );
-    $libvirt_storage->add_by_path( $dst_image_path );
+    if (! $libvirt_storage->add_by_path( $src_image_path )) {
+      croak "add_by_path ( $src_image_path ) failure";
+    }
+
+    if (! $libvirt_storage->add_by_path( $dst_image_path )) {
+      croak "add_by_path ( $dst_image_path ) failure";
+    }
+
     $self->make_image_cloning( $src_image_path, $dst_image_path );
 
     # ディスクに書き込むパラメータが全てそろっていたら
