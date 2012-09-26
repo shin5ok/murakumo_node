@@ -10,6 +10,7 @@ use LWP::UserAgent;
 use Config::General;
 use Sys::Syslog qw(:DEFAULT setlogsock);
 use IPC::Open2;
+use Log::Log4perl;
 
 use FindBin;
 our $config_path     = qq{/home/smc/murakumo_node/murakumo_node.conf};
@@ -131,7 +132,7 @@ sub get_api_key {
 
 
 sub logger {
-  Log::Log4perl->init( $log_config_path );
+  Log::Log4perl::init( $log_config_path );
   my $log = Log::Log4perl->get_logger;
   my $level      = shift;
   my $log_string = shift;

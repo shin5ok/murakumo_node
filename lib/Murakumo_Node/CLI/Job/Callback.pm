@@ -65,6 +65,12 @@ sub call {
   my $callback_func = sub {
     my $arg_ref          = shift;
     my ( $uri, $params ) = @$arg_ref;
+
+    warn "--- CALLBACK called ---------";
+    warn "uri: " . $uri;
+    warn Dumper $params;
+    warn "-----------------------------";
+
     require Murakumo_Node::CLI::Remote_JSON_API;
     my $api = Murakumo_Node::CLI::Remote_JSON_API->new;
 
@@ -108,12 +114,6 @@ sub call {
 
     }
   }
-
-  # warn sprintf "%s %s >>> %s : %s (%s)", __PACKAGE__,
-  #                                       $self->{uri},
-  #                                       Dumper $params,
-  #                                       $response->content || "### ERROR ###",
-  #                                       $response->code    || 000;
 
   return 0;
 

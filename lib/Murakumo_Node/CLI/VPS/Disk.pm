@@ -75,11 +75,6 @@ sub create {
     $callback->set_result( 1 );
   }     
 
-  # DESTRUCTOR call... following code is not necessary
-  # if (! $callback->call(\%callback_params)) {
-  #   critical("callback /vps/disk/create/ error ", Dumper \%callback_params);
-  # }
-
   return $fail_count == 0;
 
 }
@@ -171,10 +166,19 @@ sub clone {
 
 sub clone_for_image {
   my ($self, $argv) = @_;
-  warn Dumper $argv;
 
   no strict 'refs';
-  # src_uuid と dst_hostname は、必須
+  my @param_names = qw(
+                        src_uuid
+                        dst_uuid
+                        dst_image_path
+                       );
+
+  for my $name ( @param_names ) {
+    exists $argv->{$name}
+      or croak "*** $name is empty";
+  }
+
   my (
        $src_uuid,
        $dst_hostname,
@@ -183,11 +187,11 @@ sub clone_for_image {
        $mask,
        $gw,
        $reserve_uuid,
-       $dst_uuid,       # option
-       $src_image_path, # option 
-       $dst_image_path, # option
-       $callback_host,  # option
-       $set_network,    # option
+       $dst_uuid,      
+       $src_image_path,
+       $dst_image_path,
+       $callback_host, 
+       $set_network,   
       )
       = (
           $argv->{src_uuid},
@@ -206,8 +210,6 @@ sub clone_for_image {
 
   my $use_public = exists $argv->{public};
 
-  $self->maked_file( $dst_image_path );
-
   $callback_host ||= $config->{callback_host};
   my $callback_uri = sprintf "http://%s:3000/vps/define/commit/", $callback_host;
   my $callback     = Murakumo_Node::CLI::Job::Callback->new({
@@ -223,6 +225,8 @@ sub clone_for_image {
 
   local $@;
   eval {
+
+    $self->maked_file( $dst_image_path );
 
     require Murakumo_Node::CLI::Libvirt::Storage;
     my $libvirt_storage = Murakumo_Node::CLI::Libvirt::Storage->new;

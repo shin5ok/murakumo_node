@@ -187,30 +187,10 @@ sub clone :Local {
 
   my $job_model = $c->model('Job');
 
-  dumper($params);
-
-  local $@;
-  eval {
-    no strict 'refs';
-
-    my @param_names = qw(
-                          src_uuid
-                          dst_uuid
-                          dst_image_path
-                         );
-
-    for my $name ( @param_names ) {
-      exists $params->{$name}
-        or croak "*** $name is empty";
-    }
-  };
-
-  if (! $@) {
-    my $r = $job_model->register('VPS::Clone', $params);
-    if ($r) {
-      $c->stash->{result} = 1;
-      $c->log->info("vps clone job " . Dumper $params);
-    };
+  my $r = $job_model->register('VPS::Clone', $params);
+  if ($r) {
+    $c->stash->{result} = 1;
+    $c->log->info("vps clone job " . Dumper $params);
   } else {
     $c->stash->{error} = $@;
   }
