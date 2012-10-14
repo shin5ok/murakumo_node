@@ -1,11 +1,8 @@
 use warnings;
 use strict;
 
-package Murakumo_Node::CLI::Libvirt::Storage 0.02;
+package Murakumo_Node::CLI::Libvirt::Storage 0.03;
 use FindBin;
-use lib qq{$FindBin::Bin/../lib};
-use Murakumo_Node::CLI::Utils;
-use Murakumo_Node::CLI::Libvirt;
 use Carp;
 use Data::Dumper;
 use File::Path;
@@ -13,12 +10,15 @@ use XML::TreePP ();
 use JSON;
 use IPC::Cmd qw(run_forked);
 
+use lib qq{$FindBin::Bin/../lib};
+use Murakumo_Node::CLI::Utils;
+use Murakumo_Node::CLI::Libvirt;
 use base q(Murakumo_Node::CLI::Libvirt);
 
 use Murakumo_Node::CLI::Libvirt::XML;
 use Murakumo_Node::CLI::Remote_JSON_API;
 
-our $mount_timeout = 10;
+my $config = Murakumo_Node::CLI::Utils->config;
 
 sub del {
   my ($self, $uuid) = @_;
@@ -38,12 +38,17 @@ sub del {
     return 1;
   }
 
-  my $pool = $self->conn->get_storage_pool_by_uuid( $uuid );
+  my $api_response = Murakumo_Node::CLI::Remote_JSON_API->new->get("/storage/info/", { uuid => $uuid });
+  my $api_result   = decode_json $api_response->content;
 
-  # return $pool->undefine;
-  return $pool->destroy;
+  if (! $self->umount_nfs_storage( $api_result->{data} )) {
+    croak "*** umount error";
+  } else {
+    return 1;
+  }
 
 }
+
 
 sub add_by_path {
   my ($self, $storage_path) = @_;
@@ -70,30 +75,10 @@ sub add_by_path {
 
 sub add {
   my ($self, $uuid) = @_;
-  # 2012年  5月 22日 火曜日 11:53:38 JST
-  # <pool type='netfs'>
-  #   <name>[% uuid %]</name>
-  #   <uuid>[% uuid %]</uuid>
-  #   <capacity>0</capacity>
-  #   <allocation>0</allocation>
-  #   <available>0</available>
-  #   <source>
-  #     <host name='[% host %]'/>
-  #     <dir path='[% export_path %]'/>
-  #     <format type='auto'/>
-  #   </source>
-  #   <target>
-  #     <path>[% mount_path %]</path>
-  #     <permissions>
-  #       <mode>0700</mode>
-  #       <owner>-1</owner>
-  #       <group>-1</group>
-  #     </permissions>
-  #  </target>
-  # </pool>
 
   my @pools = $self->conn->list_storage_pools;
 
+  # /proc/mounts から取得した方が正確だけどとりあえず
   my $mount   = `/bin/mount`;
   my $xml_tpp = XML::TreePP->new;
   POOL:
@@ -106,17 +91,8 @@ sub add {
         # mountされているか
         if ($mount =~ m{/$uuid/?}) {
           # されてたらok
-          warn "pool list for nfs $uuid ok";
           return 1;
-        } else {
-          # されてないなら一度消す
-          warn "destroy for $uuid";
-          warn Dumper $xml_ref;
-          $pool->destroy;
-          last POOL;
         }
-      } else {
-        return 1;
       }
     }
   }
@@ -131,11 +107,7 @@ sub add {
     # ディレクトリを作成
     -e $data->{mount_path} or mkpath $data->{mount_path}, { verbose => 1 };
 
-    my $xml_data = Murakumo_Node::CLI::Libvirt::XML->new->create_storage_xml( $data );
-
-    if (! $self->conn->create_storage_pool( $xml_data )) {
-      croak "*** storage pool $uuid create error";
-    }
+    $self->mount_nfs_storage( $data );
     return 1;
 
   } else {
@@ -143,5 +115,57 @@ sub add {
   }
 
 }
+
+sub mount_nfs_storage {
+  my $self   = shift;
+  my $data   = shift;
+  my $umount = shift || 0;
+
+  # {
+  # 
+  #     "authed": 1,
+  #     "data": {
+  #         "mount_path": "/nfs/384b1103-b4d6-42a8-9f3e-533be1955447",
+  #         "type": "nfs",
+  #         "export_path": "/export/vps",
+  #         "uuid": "384b1103-b4d6-42a8-9f3e-533be1955447",
+  #         "available": "1",
+  #         "host": "192.168.233.123"
+  #     },
+  #     "uuid": "384b1103-b4d6-42a8-9f3e-533be1955447",
+  #     "project_id": "00000010",
+  #     "message": "",
+  #     "result": 1
+  # 
+  # }
+
+  my $command;
+
+  if (not $umount) {
+    my $option  = $config->{nfs_mount_option} || "";
+    $command = sprintf "/bin/mount %s %s:%s %s",
+                          $option,
+                          $data->{host},
+                          $data->{export_path},
+                          $data->{mount_path};
+  } else {
+    # 強制umount -l は しない
+    $command = sprintf "/bin/umount %s", $data->{mount_path};
+
+  }
+                           
+  warn "command: $command";
+  my $result_ref = run_forked( $command, { timeout => 10 } ); 
+
+  return $result_ref->{exit_code} == 0;
+
+}
+
+sub umount_nfs_storage {
+  my ($self, $data) = @_;
+  $self->mount_nfs_storage( $data, 1 );
+
+}
+
 
 1;
