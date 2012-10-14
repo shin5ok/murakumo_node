@@ -23,20 +23,8 @@ my $config = Murakumo_Node::CLI::Utils->config;
 sub del {
   my ($self, $uuid) = @_;
 
-  my @pools = $self->conn->list_storage_pools;
-
-  my $exist = 0;
-  for my $pool (@pools) {
-    # 既にないかチェック
-    if ($uuid eq $pool->get_uuid_string) {
-      $exist = 1;
-    }
-  }
-
-  if (! $exist) {
-    warn "$uuid is not found...return";
-    return 1;
-  }
+  $self->is_mounted_storage( $uuid )
+    or return 1;
 
   my $api_response = Murakumo_Node::CLI::Remote_JSON_API->new->get("/storage/info/", { uuid => $uuid });
   my $api_result   = decode_json $api_response->content;
@@ -46,6 +34,23 @@ sub del {
   } else {
     return 1;
   }
+
+}
+
+sub is_mounted_storage {
+  my ($self, $uuid) = @_;
+  my $mount   = `/bin/mount`;
+  open my $mounts, "<", "/proc/mounts";
+  my $mounted = 0;
+  while (my $line = <$mounts>) {
+    if ($line =~ m{/$uuid/?}) {
+      $mounted = 1;
+      last;
+    }
+  }
+  close $mounts;
+
+  return $mounted;
 
 }
 
@@ -76,25 +81,10 @@ sub add_by_path {
 sub add {
   my ($self, $uuid) = @_;
 
-  my @pools = $self->conn->list_storage_pools;
+  if ($self->is_mounted_storage( $uuid ) ) {
+    # 既に mount されていたら
+    return 1;
 
-  # /proc/mounts から取得した方が正確だけどとりあえず
-  my $mount   = `/bin/mount`;
-  my $xml_tpp = XML::TreePP->new;
-  POOL:
-  for my $pool (@pools) {
-    # 既にあるかチェック
-    if ($uuid eq $pool->get_uuid_string) {
-      my $xml     = $pool->get_xml_description;
-      my $xml_ref = $xml_tpp->parse($xml);
-      if ($xml_ref->{pool}->{'-type'} eq 'netfs') {
-        # mountされているか
-        if ($mount =~ m{/$uuid/?}) {
-          # されてたらok
-          return 1;
-        }
-      }
-    }
   }
 
   my $api_response = Murakumo_Node::CLI::Remote_JSON_API->new->get("/storage/info/", { uuid => $uuid });
@@ -142,7 +132,10 @@ sub mount_nfs_storage {
   my $command;
 
   if (not $umount) {
-    my $option  = $config->{nfs_mount_option} || "";
+    my $option  = $config->{nfs_mount_option}
+                ? "-o $config->{nfs_mount_option}"
+                : "";
+
     $command = sprintf "/bin/mount %s %s:%s %s",
                           $option,
                           $data->{host},
