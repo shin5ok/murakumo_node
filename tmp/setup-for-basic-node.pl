@@ -124,7 +124,7 @@ sub conf_rewrite {
 }
 
 sub murakumo_perl_create {
-  if (-e "/usr/bin/murakumo-perl") {
+  if (! -e "/usr/bin/murakumo-perl") {
     if (fork() == 0) {
       chdir "/usr/bin";
       symlink "/home/smc/bin/perl", "murakumo-perl";
