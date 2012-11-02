@@ -29,6 +29,7 @@ if ( $0 =~ /retry/i ) {
   $sleep    = 30;
 }
 
+$0 = $progname;
 newdaemon(
   progname   => $progname,
   pidfile    => '/var/run/' .  $progname . ".pid",

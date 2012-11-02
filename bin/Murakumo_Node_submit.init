@@ -47,6 +47,8 @@ my $web_agent = Murakumo_Node::CLI::Remote_JSON_API->new(
 
 daemonize() if ! exists $ENV{DEBUG};
 
+$0 = $progname;
+
 # libvirt への接続
 our $vmm;
 my $submit_interval = exists $ENV{MURAKUMO_NODE_INTERVAL}
