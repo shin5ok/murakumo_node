@@ -11,8 +11,8 @@ if ($> != 0) {
 my %param = (
   admin_host => "",
   nfs_host => "",
-  nfs_export_path => "",
-  nfs_mount_path => "",
+  "nfs_export_path(for public share)" => "",
+  "nfs_mount_path(for public share)" => "",
 );
 
 while (1) {
@@ -34,7 +34,10 @@ while (1) {
 
 }
 
-warn Dumper \%param;
+{
+  local $Data::Dumper::Terse = 1;
+  warn Dumper \%param;
+};
 
 print "\n";
 print " [ press any key for setup ]\n";
@@ -68,6 +71,7 @@ my @cmds = (
   \&aliases,
   \q{newaliases},
   \&fstab,
+  \&make_mount_path,
 );
 
 for (@cmds) {
@@ -76,7 +80,7 @@ for (@cmds) {
     system qq[$command];
   }
   elsif (ref $_ eq 'CODE') {
-    $_->(); 
+    $_->(%param); 
   }
 }
 
@@ -208,6 +212,42 @@ sub fstab {
     print {$v} "$param{admin_host}:$param{nfs_export_path}  $param{nfs_mount_path}     nfs  defaults,_netdev,nfsvers=3  0 0"."\n";
 
   }
+  close $v;
+
+}
+
+sub make_mount_path {
+  my %param = @_;
+  system "mkdir -p $param{nfs_mount_path}";  
+}
+
+sub logrotate_syslog_modify {
+  open my $v, "+<", "/etc/logrotate.d/syslog";
+  seek $v, 0, 0;
+  my @texts = <$v>;
+  grep { m[/var/log/murakumo_node_api\.log] } @texts
+    and return;
+
+  my $new = "";
+  for my $text ( @texts ) {
+    if ($text =~ /^\s*}/) {
+      $new .= "/var/log/murakumo_node_api.log\n"; 
+      next;
+    }
+    if ($text =~ /^(\s*)sharedscript/) {
+      $new .= "$1daily\n";
+      $new .= "$1compress\n";
+      next;
+
+    }
+
+    $new .= $text;
+  }
+
+  seek $v, 0, 0;
+  truncate $v, 0;
+  print {$v} $new;
+
   close $v;
 
 }

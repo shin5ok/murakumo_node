@@ -22,7 +22,7 @@ sub new {
   my ($class, $args) = @_;
 
   my %ts_init_args;
-  $ts_init_args{verbose}   = exists $ENV{DEBUG};
+  $ts_init_args{verbose} = exists $ENV{DEBUG};
 
   my $db_path = exists $args->{db_path}
               ? $args->{db_path}
@@ -30,12 +30,7 @@ sub new {
 
   $ts_init_args{databases} = [ { dsn => 'dbi:SQLite:dbname=' . $db_path } ];
 
-  warn "#############";
-  warn Dumper \%ts_init_args;
-  warn "#############";
-
   my $obj = TheSchwartz->new( %ts_init_args );
-
   $obj or croak __PACKAGE__ . " new error";
 
   return bless +{ theschwartz => $obj }, $class;
@@ -52,9 +47,7 @@ sub register {
     no strict 'refs';
     $arg_ref->{_worker_class} = $worker;
   }
-warn Dumper $arg_ref;
 
-  #
   return $self->{theschwartz}->insert( 'Murakumo_Node::CLI::Job::Work' => $arg_ref );
 
 }
