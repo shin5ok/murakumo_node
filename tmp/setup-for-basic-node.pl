@@ -9,17 +9,22 @@ if ($> != 0) {
 }
 
 my %param = (
-  admin_host => "",
-  nfs_host => "",
-  "nfs_export_path(for public share)" => "",
-  "nfs_mount_path(for public share)" => "",
+  "admin_host_ip" => "",
+  "admin_host_name" => "",
+  "nfs_host_ip" => "",
+  "nfs_export_path" => "",
+  "nfs_mount_path" => "",
 );
 
 while (1) {
-  print "admin_host > ";
-  chomp ($param{admin_host} = <STDIN>);
-  print "nfs share export host > ";
-  chomp ($param{nfs_host} = <STDIN> );
+  print "admin host ip > ";
+  chomp ($param{admin_host_ip} = <STDIN>);
+  print "admin host name > ";
+  chomp ($param{admin_host_name} = <STDIN>);
+  print "nfs share host ip > ";
+  chomp ($param{nfs_host_ip} = <STDIN> );
+  print "nfs share host name > ";
+  chomp ($param{nfs_host_name} = <STDIN> );
   print "nfs share export path > ";
   chomp ($param{nfs_export_path} = <STDIN> );
   print "nfs share mount path > ";
@@ -45,7 +50,7 @@ print " [ press any key for setup ]\n";
 
 sub param_check {
   for my $v ( keys %param ) {
-    $param{$v} or return 0;
+    defined $param{$v} or return 0;
   }
   return 1;
 
@@ -57,7 +62,7 @@ my @cmds = (
   \q{chkconfig network on},
   \q{mkdir -p /root/.ssh},
   \q{chmod 700 /root/.ssh},
-  \&ssh_make,
+  \&make_ssh_config,
   \&conf_rewrite,
   \&murakumo_perl_create,
   \q{cd /home/smc/murakumo_node/bin; sh ./daemon-init-set.sh},
@@ -71,7 +76,9 @@ my @cmds = (
   \&aliases,
   \q{newaliases},
   \&fstab,
+  \&hosts_rewrite,
   \&make_mount_path,
+  \&logrotate_syslog_modify,
 );
 
 for (@cmds) {
@@ -84,7 +91,7 @@ for (@cmds) {
   }
 }
 
-sub ssh_make {
+sub make_ssh_config {
   open my $v ,">", "/root/.ssh/config";
   print ${v} "
 Host *
@@ -100,18 +107,18 @@ sub conf_rewrite {
 
   seek $v, 0, 0;
   my $new = "";
-  my $admin_host = $param{admin_host};
+  my $admin_host_ip = $param{admin_host_ip};
   while (<$v>) {
     if (/^job_callback_uri/) {
-      $new .= "job_callback_uri http://$admin_host:3000/job/update/\n";
+      $new .= "job_callback_uri http://$admin_host_ip:3000/job/update/\n";
       next;
     }
     if (/^api_uri/) {
-      $new .= "http://$admin_host:3000/\n";
+      $new .= "http://$admin_host_ip:3000/\n";
       next;
     }
     if (/^callback_host\s+/)  {
-      $new .= "callback_host $admin_host\n";
+      $new .= "callback_host $admin_host_ip\n";
       next;
     }
     $new .= $_
@@ -172,8 +179,8 @@ sub rsyslog_conf {
       next;
     }
 
-    if (m|^local7|) {
-      $new .= "local0.*    /var/log/murakumo_node_api.log\n";
+    if (m|^local7\S*(\s+)\S+|) {
+      $new .= "local0.*$1/var/log/murakumo_node_api.log\n";
     }
     $new .= $_;
 
@@ -207,9 +214,9 @@ sub aliases {
 sub fstab {
   open my $v, "+<", "/etc/fstab";
   seek $v, 0, 0;
-  if (! grep { m[^$param{admin_host}:/] } <$v> ) {
+  if (! grep { m[^$param{admin_host_ip}:/] } <$v> ) {
     seek $v, 0, 2;
-    print {$v} "$param{admin_host}:$param{nfs_export_path}  $param{nfs_mount_path}     nfs  defaults,_netdev,nfsvers=3  0 0"."\n";
+    print {$v} "$param{admin_host_ip}:$param{nfs_export_path}  $param{nfs_mount_path}     nfs  defaults,_netdev,vers=3  0 0"."\n";
 
   }
   close $v;
@@ -230,11 +237,11 @@ sub logrotate_syslog_modify {
 
   my $new = "";
   for my $text ( @texts ) {
-    if ($text =~ /^\s*}/) {
+    if ($text =~ /^\s*{/) {
       $new .= "/var/log/murakumo_node_api.log\n"; 
-      next;
     }
     if ($text =~ /^(\s*)sharedscript/) {
+      $new .= "$1sharedscript\n";
       $new .= "$1daily\n";
       $new .= "$1compress\n";
       next;
@@ -251,3 +258,19 @@ sub logrotate_syslog_modify {
   close $v;
 
 }
+
+sub hosts_rewrite {
+  my %param = @_;
+  open my $fh, "+<", "/etc/hosts";
+  flock $fh, 2;
+  seek $fh, 0, 0;
+  grep { /$param{admin_host_name}/ } <$fh>
+    and return;
+
+  seek $fh, 0, 2;
+  print {$fh} "$param{admin_host_ip}   $param{admin_host_name}\n";
+  print {$fh} "$param{nfs_host_ip}     $param{nfs_host_name}\n";
+  close $fh;
+
+}
+
