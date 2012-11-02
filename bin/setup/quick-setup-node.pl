@@ -1,7 +1,10 @@
+#!/home/smc/bin/perl
 use strict;
 use warnings;
 use File::Path;
 use Data::Dumper;
+
+use Carp;
 
 if ($> != 0) {
   warn "$0 is run by root";
@@ -58,6 +61,7 @@ sub param_check {
 
 
 my @cmds = (
+  \&require_rpm_install,
   \q{chkconfig NetworkManager --del},
   \q{chkconfig network on},
   \q{mkdir -p /root/.ssh},
@@ -272,5 +276,14 @@ sub hosts_rewrite {
   print {$fh} "$param{nfs_host_ip}     $param{nfs_host_name}\n";
   close $fh;
 
+}
+
+sub require_rpm_install {
+  for my $rpm (qw( munin-node perl-Sys-Guestfs )) {
+    my $r = system "yum -y install $rpm";
+    if ($r != 0) {
+      croak "*** yum install error... check internet connectivity, or proxy for yum";
+    }
+  }
 }
 
