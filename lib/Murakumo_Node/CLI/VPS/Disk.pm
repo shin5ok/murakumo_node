@@ -208,7 +208,7 @@ sub clone_for_image {
           $argv->{src_image_path},
           $argv->{dst_image_path},
           $argv->{callback_host},
-          $argv->{set_network},
+          $argv->{set_network},  # nic device name (ex. eth0) 
         );
 
   my $use_public = exists $argv->{public};
@@ -257,6 +257,7 @@ sub clone_for_image {
                                                  drive    => $dst_image_path,
                                                  gw       => $gw,
                                                  mask     => $mask,
+                                                 nic      => $set_network,
                                              } )
       or croak "*** set_network is error";
     }

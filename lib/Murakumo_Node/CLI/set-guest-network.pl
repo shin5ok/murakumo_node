@@ -9,7 +9,7 @@ use Getopt::Long;
 use Carp;
 
 my %opt;
-GetOptions( \%opt, "drive=s", "mac=s", "ip=s", "mask=s", "gw=s", "hostname=s");
+GetOptions( \%opt, "drive=s", "mac=s", "ip=s", "mask=s", "gw=s", "hostname=s", "nic=s");
 
 my $debug = exists $ENV{DEBUG};
 warn Dumper \@ARGV if $debug;
@@ -19,8 +19,11 @@ for my $key ( qw( drive mac ip mask gw hostname ) ) {
     or croak "*** $key parameter error";
 }
 
-my ($drive, $mac, $ip, $mask, $gw, $hostname)
-  = ($opt{drive}, $opt{mac}, $opt{ip}, $opt{mask}, $opt{gw}, $opt{hostname});
+defined $opt{nic}
+  or $opt{nic} = "eth0";
+
+my ($drive, $mac, $ip, $mask, $gw, $hostname, $nic)
+  = ($opt{drive}, $opt{mac}, $opt{ip}, $opt{mask}, $opt{gw}, $opt{hostname}, $opt{nic});
 
 my $h = Sys::Guestfs->new;
 $h->set_trace(1) if $debug;
@@ -65,7 +68,7 @@ my @write_files_content_array = (
                },
   },    
   {
-    file    => "/etc/sysconfig/network-scripts/ifcfg-eth0",
+    file    => "/etc/sysconfig/network-scripts/ifcfg-$nic",
     content => make_cfg_content(),
   },    
   {
@@ -75,7 +78,7 @@ my @write_files_content_array = (
                  my $new_mac = $mac;
                  $new_mac or return;
 
-                 # SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="78:2b:cb:2a:18:31", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
+                 # SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="78:2b:cb:2a:18:31", ATTR{type}=="1", KERNEL=="eth*", NAME="$nic"
 
                  my $old_mac;
                  __FILE_LINE__:
@@ -83,7 +86,7 @@ my @write_files_content_array = (
                    $line =~ /^\s* #/x 
                      or next __FILE_LINE__;
 
-                   $line =~ / NAME \s* \= \s* \"? eth0 \"? /x
+                   $line =~ / NAME \s* \= \s* \"? $nic \"? /x
                      or next __FILE_LINE__;
                    ($old_mac) =
                      $line =~ /
@@ -111,23 +114,23 @@ my @write_files_content_array = (
                  my $new_mac = $mac;
                  $new_mac or return;
 
-                 my ($eth0_part)
+                 my ($nic_part)
                    = $content =~ /
                      ^ \- $
                      (
                        [^\-]*
-                       device : \s* eth0 \s* $
+                       device : \s* $nic \s* $
                        [^\-]*
                      )
                      ^ \- $
                    /xsm;
 
-                   warn "eth0_part: ", $eth0_part if $debug;
+                   warn "nic_part: ", $nic_part if $debug;
 
 
-                 $eth0_part or return $content;
+                 $nic_part or return $content;
 
-                 my ($old_mac) = $eth0_part =~ /
+                 my ($old_mac) = $nic_part =~ /
                    ^ network \. hwaddr : \s* (\S+)
                    /xsm;
 
@@ -207,7 +210,7 @@ __EOD__
 
 sub make_cfg_content {
   my $_x = << "__EOD__";
-DEVICE=eth0
+DEVICE=$nic
 IPADDR=$ip
 NETMASK=$mask
 HWADDR=$mac

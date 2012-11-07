@@ -26,13 +26,16 @@ sub set_network {
 
   my ($self, $p) = @_;
   no strict 'refs';
-  my ($drive, $mac, $ip, $mask, $gw, $hostname)
-    = ($p->{drive}, $p->{mac}, $p->{ip}, $p->{mask}, $p->{gw}, $p->{hostname});
+  my ($drive, $mac, $ip, $mask, $gw, $hostname, $nic)
+    = ($p->{drive}, $p->{mac}, $p->{ip}, $p->{mask}, $p->{gw}, $p->{hostname}, $p->{nic});
 
   my $command_t = "%s --drive %s --mac %s --ip %s --mask %s --gw %s";
-  if ($hostname) {
-     $command_t = "%s --drive %s --mac %s --ip %s --mask %s --gw %s --hostname %s";
-  }
+
+  $hostname and
+    $command_t .= " --hostname $hostname";    
+
+  $nic and 
+    $command_t .= " --nic $nic";
  
   my $command = sprintf $command_t,
                         $self->{script},

@@ -5,6 +5,15 @@ use File::Path;
 use Data::Dumper;
 
 use Carp;
+use opts;
+
+opts my $admin_host_ip   => 'Str',
+     my $admin_host_name => 'Str',
+     my $nfs_host_ip     => 'Str',
+     my $nfs_host_name   => 'Str',
+     my $nfs_export_path => 'Str',
+     my $nfs_mount_path  => 'Str',
+     my $interactive     => 'Bool';
 
 if ($> != 0) {
   warn "$0 is run by root";
@@ -12,34 +21,43 @@ if ($> != 0) {
 }
 
 my %param = (
-  "admin_host_ip" => "",
-  "admin_host_name" => "",
-  "nfs_host_ip" => "",
-  "nfs_export_path" => "",
-  "nfs_mount_path" => "",
+  "admin_host_ip"   => $admin_host_ip,
+  "admin_host_name" => $admin_host_name,
+  "nfs_host_ip"     => $nfs_host_ip,
+  "nfs_host_name"   => $nfs_host_name,
+  "nfs_export_path" => $nfs_export_path,
+  "nfs_mount_path"  => $nfs_mount_path,
 );
 
-while (1) {
-  print "admin host ip > ";
-  chomp ($param{admin_host_ip} = <STDIN>);
-  print "admin host name > ";
-  chomp ($param{admin_host_name} = <STDIN>);
-  print "nfs share host ip > ";
-  chomp ($param{nfs_host_ip} = <STDIN> );
-  print "nfs share host name > ";
-  chomp ($param{nfs_host_name} = <STDIN> );
-  print "nfs share export path > ";
-  chomp ($param{nfs_export_path} = <STDIN> );
-  print "nfs share mount path > ";
-  chomp ($param{nfs_mount_path} = <STDIN> );
+if (! param_check() or $interactive) {
 
-  if (param_check()) {
-    last;
-  } else {
-    print "param is invalid...next\n";
-    next;
+  if (! \%param) {
+    print "require param is miss... input interactive...";
+    sleep 1;
   }
 
+  while (1) {
+    print "admin host ip > ";
+    chomp ($param{admin_host_ip} = <STDIN>);
+    print "admin host name > ";
+    chomp ($param{admin_host_name} = <STDIN>);
+    print "nfs share host ip > ";
+    chomp ($param{nfs_host_ip} = <STDIN> );
+    print "nfs share host name > ";
+    chomp ($param{nfs_host_name} = <STDIN> );
+    print "nfs share export path > ";
+    chomp ($param{nfs_export_path} = <STDIN> );
+    print "nfs share mount path > ";
+    chomp ($param{nfs_mount_path} = <STDIN> );
+  
+    if (param_check()) {
+      last;
+    } else {
+      print "param is invalid...next\n";
+      next;
+    }
+  
+  }
 }
 
 {
@@ -67,6 +85,7 @@ my @cmds = (
   \q{mkdir -p /root/.ssh},
   \q{chmod 700 /root/.ssh},
   \&make_ssh_config,
+  \&root_bash_env,
   \&conf_rewrite,
   \&murakumo_perl_create,
   \q{cd /home/smc/murakumo_node/bin; sh ./daemon-init-set.sh},
@@ -279,11 +298,27 @@ sub hosts_rewrite {
 }
 
 sub require_rpm_install {
-  for my $rpm (qw( munin-node perl-Sys-Guestfs )) {
+  my @require_rpms = qw( perl-Sys-Guestfs );
+  for my $rpm ( @require_rpms ) {
     my $r = system "yum -y install $rpm";
     if ($r != 0) {
       croak "*** yum install error... check internet connectivity, or proxy for yum";
     }
   }
 }
+
+sub root_bash_env {
+  open my $fh, ">>", "/root/.bash_profile";
+  flock $fh, 2;
+
+  print {$fh} << 'EOD';
+
+export PERL5LIB=/home/smc/murakumo_node/lib
+export PATH=/home/smc/murakumo_node/bin:/home/smc/bin:$PATH
+EOD
+
+  close $fh;
+
+}
+
 
