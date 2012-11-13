@@ -150,7 +150,10 @@ sub mount_nfs_storage {
   warn "command: $command";
   my $result_ref = run_forked( $command, { timeout => 10 } ); 
 
-  return $result_ref->{exit_code} == 0;
+ $result_ref->{exit_code} == 0
+   or croak "*** nfs mount error($command)";
+
+ return 1;
 
 }
 
