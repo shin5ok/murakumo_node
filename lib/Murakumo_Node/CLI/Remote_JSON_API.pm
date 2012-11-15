@@ -121,6 +121,7 @@ sub json_post {
   eval {
     $response = $wwwua->request( $request );
     warn $response->code;
+    warn $response->content;
   };
   return $response;
 

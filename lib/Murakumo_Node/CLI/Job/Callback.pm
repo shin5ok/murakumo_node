@@ -34,6 +34,18 @@ sub new {
   return $obj;
 }
 
+sub uri {
+  my ($self, $uri) = @_;
+
+  no strict 'refs';
+  if ($uri) {
+    $self->{uri} = $uri;
+  }
+
+  return $self->{uri} || qq{};
+
+}
+
 sub set_params {
   my $self   = shift;
   my $params = shift || {};

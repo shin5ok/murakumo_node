@@ -57,6 +57,8 @@ sub create {
       or $fail_count++;
 
   }
+
+  # デフォルトは commit
   my $callback_uri = sprintf "http://%s:3000/vps/define/commit/", $config->{callback_host};
   my $callback     = Murakumo_Node::CLI::Job::Callback->new({
                                                                uri           => $callback_uri,
@@ -68,12 +70,16 @@ sub create {
                            vps_uuid     => $vps_uuid,
                          );
 
+  if ($fail_count > 0) {
+    $callback->uri(sprintf "http://%s:3000/vps/define/remove_commit/", $config->{callback_host});
+    $callback_params{force_remove} = 1;
+
+  }
 
   $callback->set_params(\%callback_params);
 
-  if ($fail_count == 0) {
-    $callback->set_result( 1 );
-  }     
+  # いちおう最後まで処理した
+  $callback->set_result( 1 );
 
   return $fail_count == 0;
 
@@ -114,7 +120,7 @@ sub remove {
                                                             });
 
   my %callback_params = (
-                           uuid         => $vps_uuid,
+                           vps_uuid => $vps_uuid,
                          );
 
   $callback->set_params( \%callback_params );
