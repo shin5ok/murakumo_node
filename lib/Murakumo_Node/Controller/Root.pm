@@ -78,6 +78,12 @@ sub end : ActionClass('RenderView') {
 
 }
 
+sub check :Local {
+  my ($self, $c) = @_;
+  $c->response->body('1');
+
+}
+
 =head2 default
 
 Standard 404 error page
