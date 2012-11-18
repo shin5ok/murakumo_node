@@ -107,7 +107,7 @@ sub remove {
     my $rename_disk_path = sprintf "%s.%s", $disk_path, $config->{unlink_disk_ext};
 
     -e $disk_path
-      or croak "*** $rename_disk_path is not found";
+      or croak "*** $disk_path is not found";
 
     rename $disk_path, $rename_disk_path;
     -e $disk_path and $fail_count++;

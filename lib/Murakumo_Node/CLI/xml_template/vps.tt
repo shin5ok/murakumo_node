@@ -7,8 +7,13 @@
   <vcpu>[% cpu -%]</vcpu>
   <os>
     <type arch="x86_64" machine="rhel6.2.0">hvm</type>
+[% IF cdrom_boot -%]
+    <boot dev="cdrom"/>
+    <boot dev="hd"/>
+[% ELSE -%]
     <boot dev="hd"/>
     <boot dev="cdrom"/>
+[% END -%]
     <bootmenu enable="no"/>
   </os>
   <features>

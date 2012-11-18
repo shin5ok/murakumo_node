@@ -78,6 +78,7 @@ sub boot2 {
   no strict 'refs';
   my $vps_params    = $args_ref->{vps_params};
   my $clean_traffic = $args_ref->{clean_traffic} || 0;
+  my $cdrom_boot    = $args_ref->{cdrom_boot}    || 0;
   {
     my @require_keys = qw(
       disks     
@@ -200,11 +201,12 @@ sub boot2 {
       my $uuid = $vps_params->{uuid};
     
       my $r = {
-        name   => $vps_params->{name},
-        uuid   => $vps_params->{uuid},
-        memory => $vps_params->{memory},
-        cpu    => $vps_params->{cpu_number},
-        clock  => $vps_params->{clock},
+        name       => $vps_params->{name},
+        uuid       => $vps_params->{uuid},
+        memory     => $vps_params->{memory},
+        cpu        => $vps_params->{cpu_number},
+        clock      => $vps_params->{clock},
+        cdrom_boot => $cdrom_boot,
       };
 
       exists $vps_params->{cdrom_path}
