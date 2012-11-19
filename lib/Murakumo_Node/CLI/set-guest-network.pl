@@ -130,7 +130,6 @@ my @write_files_content_array = (
 
                  $nic_part or return $content;
 
-                 my ($old_mac) = $nic_part =~ /
                    ^ network \. hwaddr : \s* (\S+)
                    /xsm;
 
@@ -146,7 +145,7 @@ my @write_files_content_array = (
 my $failure = 0;
 FILESYSTEMS: for my $dev ( keys %s ) {
 
-  $s{$dev} eq 'swap' and next;
+  $s{$dev} =~ m|^ext[34]$| or next;
   $h->mount( $dev, '/' );
   if ($h->exists( '/etc' )) {
 
