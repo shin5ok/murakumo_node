@@ -130,6 +130,7 @@ my @write_files_content_array = (
 
                  $nic_part or return $content;
 
+                 my ($old_mac) = $nic_part =~ /
                    ^ network \. hwaddr : \s* (\S+)
                    /xsm;
 
