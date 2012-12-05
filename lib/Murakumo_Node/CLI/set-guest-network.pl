@@ -19,6 +19,10 @@ for my $key ( qw( drive mac ip mask gw hostname ) ) {
     or croak "*** $key parameter error";
 }
 
+if ($opt{nic} !~ /^eth\d+/) {
+  croak "*** nic name format error";
+}
+
 defined $opt{nic}
   or $opt{nic} = "eth0";
 
