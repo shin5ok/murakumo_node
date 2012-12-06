@@ -79,6 +79,7 @@ sub boot2 {
   my $vps_params    = $args_ref->{vps_params};
   my $clean_traffic = $args_ref->{clean_traffic} || 0;
   my $cdrom_boot    = $args_ref->{cdrom_boot}    || 0;
+  my $disk_cache    = $args_ref->{disk_cache};
   {
     my @require_keys = qw(
       disks     
@@ -183,6 +184,7 @@ sub boot2 {
         image_path => $disk->{image_path},
         devname    => (sprintf "%s%s", $disk_prename, $blockname_char->[$$disk_number]),
         driver     => $driver,
+        disk_cache => $disk_cache,
       };
       $controller and $r->{controller} = $controller;
       

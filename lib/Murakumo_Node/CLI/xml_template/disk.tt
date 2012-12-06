@@ -1,5 +1,8 @@
+[% DEFAULT
+  disk_cache = 'writeback'
+-%]
     <disk type='file' device='disk'>
-      <driver name='qemu' type='raw' cache='writeback'/>
+      <driver name='qemu' type='raw' cache='[% disk_cache -%]'/>
       <source file='[% image_path -%]'/>
       <target dev='[% devname -%]' bus='[% driver -%]'/>
 [% IF driver == "ide" -%]
