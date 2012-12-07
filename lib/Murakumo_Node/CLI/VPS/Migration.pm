@@ -61,7 +61,7 @@ sub run {
              ? '--unsafe'
              : '';
 
-  return scalar IPC::Cmd::run( command => "virsh migrate $unsafe --live $uuid $uri", timeout => 600, verbose => 1, );
+  return scalar IPC::Cmd::run( command => "virsh migrate $unsafe --live $uuid $uri", verbose => 1, );
 
 #   # $dom->migrate_to_uri(desturi, flags, dname, bandwidth)
 #   my $domain = $self->conn->get_domain_by_uuid( $uuid );
