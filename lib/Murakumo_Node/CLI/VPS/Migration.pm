@@ -53,19 +53,7 @@ sub run {
 
   my $uri = sprintf "qemu+ssh://%s/system", $dst_node;
 
-  # 仮の措置・・・
-  # CentOS 6.3 以上から、vpsのディスクを "writeback" 等で使っている場合に
-  # --unsafe が必要になる
-  # 本当は vpsのディスクのcache を "none" にするべき
-  my $unsafe = $self->conn->get_library_version > 9004
-             ? '--unsafe'
-             : '';
+  return scalar IPC::Cmd::run( command => "virsh migrate --live $uuid $uri", verbose => 1, );
 
-  return scalar IPC::Cmd::run( command => "virsh migrate $unsafe --live $uuid $uri", verbose => 1, );
-
-#   # $dom->migrate_to_uri(desturi, flags, dname, bandwidth)
-#   my $domain = $self->conn->get_domain_by_uuid( $uuid );
-#   $domain->migrate_to_uri( $uri );
 }
-
 
