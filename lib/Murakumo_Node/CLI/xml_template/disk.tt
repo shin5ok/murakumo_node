@@ -1,5 +1,5 @@
 [% DEFAULT
-  disk_cache = 'writeback'
+  disk_cache = 'none'
 -%]
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw' cache='[% disk_cache -%]'/>
