@@ -1,7 +1,0 @@
-use warnings;
-use strict;
-use XML::TreePP;
-  my $xml_tpp = XML::TreePP->new( force_array => ['disk', 'interface'] );
-  my $xml_ref = $xml_tpp->parsefile( shift );
-use Data::Dumper;
-warn Dumper $xml_ref;

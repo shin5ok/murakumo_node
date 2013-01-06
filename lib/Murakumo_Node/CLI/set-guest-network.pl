@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# /etc 以下の設定ファイルの書き換えuse strict;
+# /etc 以下の設定ファイルの書き換え
 use warnings;
 use strict;
 
@@ -202,7 +202,7 @@ sub make_network_content {
     my $network_content = $ref->{org_network};
     ($hostname) = $network_content =~ /^ HOSTNAME \s* \= \s* (\S+) /msxi;
   }
-  $hostname ||= "CLONED_OS";
+  $hostname ||= "CLONED-OS";
 
   my $_x = << "__EOD__";
 NETWORKING=yes
