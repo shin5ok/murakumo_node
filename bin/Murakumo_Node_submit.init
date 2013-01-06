@@ -128,16 +128,11 @@ sub get_libvirt_conn {
   local $@;
   eval {
     # $vmm が false なら
-    warn;
     $vmm ||= Sys::Virt->new;
-    warn;
 
     # libvirt のメソッドが正しく呼べなければ、
-    warn;
     $vmm->can("get_version") or croak "error";
-    warn;
   };
-  warn $@;
   if ($@) {
     $vmm = Sys::Virt->new;
     syslog_write("conn to libvirt $@");
