@@ -165,9 +165,11 @@ FILESYSTEMS: for my $dev ( keys %s ) {
           local $@;
           eval {
             $content = $h->read_file( $v->{file} );
-            my $func    = $v->{code};
+            my $func = $v->{code};
             my $new_content = $func->( $content, \%opt );
-            $h->write( $v->{file}, $new_content );
+            if ($new_content) {
+              $h->write( $v->{file}, $new_content );
+            }
           };
           if ($@) {
             $failure = 1;

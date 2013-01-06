@@ -8,6 +8,7 @@ use Data::Dumper;
 use Getopt::Long;
 use Carp;
 
+our $murakumo_file = "/root/.murakumo";
 our $min_nic = 0; # eth0
 our $max_nic = 5; # eth5
 
@@ -27,6 +28,7 @@ our $max_nic = 5; # eth5
 #                   "mac" : "xx:xx:xx:xx:xx:yy",
 #                 },
 #               ],
+#   "uuid" : "7125fd01-fbb8-4911-ace0-fb41277d17c4",
 #   "hostname" : "vps001.example.com",
 #   "gw"  : "210.172.63.1",
 # }
@@ -192,7 +194,9 @@ FILESYSTEMS: for my $dev ( keys %s ) {
             $content = $h->read_file( $v->{file} );
             my $func = $v->{code};
             my $new_content = $func->( $content, $params );
-            $h->write( $v->{file}, $new_content );
+            if ($new_content) {
+              $h->write( $v->{file}, $new_content );
+            }
           };
           if ($@) {
             $failure = 1;
@@ -203,6 +207,10 @@ FILESYSTEMS: for my $dev ( keys %s ) {
     }
 
     last FILESYSTEMS;
+
+  } elsif ($h->exists( '/root' )) {
+
+    $h->write( $murakumo_file, $params->{uuid} );
 
   } else {
     $h->umount( $dev );
