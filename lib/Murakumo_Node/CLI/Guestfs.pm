@@ -26,10 +26,10 @@ sub set_network {
 
   my ($self, $p) = @_;
   no strict 'refs';
-  my ($drive, $mac, $ip, $mask, $gw, $hostname, $nic)
-    = ($p->{drive}, $p->{mac}, $p->{ip}, $p->{mask}, $p->{gw}, $p->{hostname}, $p->{nic});
+  my ($drive, $mac, $ip, $mask, $gw, $hostname, $nic, $uuid)
+    = ($p->{drive}, $p->{mac}, $p->{ip}, $p->{mask}, $p->{gw}, $p->{hostname}, $p->{nic}, $p->{uuid});
 
-  my $command_t = "%s --drive %s --mac %s --ip %s --mask %s --gw %s";
+  my $command_t = "%s --drive %s --uuid %s --mac %s --ip %s --mask %s --gw %s";
 
   $hostname and
     $command_t .= " --hostname $hostname";    
@@ -40,6 +40,7 @@ sub set_network {
   my $command = sprintf $command_t,
                         $self->{script},
                         $drive,
+                        $uuid,
                         $mac,
                         $ip,
                         $mask,

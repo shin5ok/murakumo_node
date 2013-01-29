@@ -9,7 +9,7 @@ use Getopt::Long;
 use Carp;
 
 my %opt;
-GetOptions( \%opt, "drive=s", "mac=s", "ip=s", "mask=s", "gw=s", "hostname=s", "nic=s");
+GetOptions( \%opt, "drive=s", "uuid=s", "mac=s", "ip=s", "mask=s", "gw=s", "hostname=s", "nic=s" );
 
 my $debug = exists $ENV{DEBUG};
 warn Dumper \@ARGV if $debug;
@@ -26,8 +26,8 @@ if ($opt{nic} !~ /^eth\d+/) {
 defined $opt{nic}
   or $opt{nic} = "eth0";
 
-my ($drive, $mac, $ip, $mask, $gw, $hostname, $nic)
-  = ($opt{drive}, $opt{mac}, $opt{ip}, $opt{mask}, $opt{gw}, $opt{hostname}, $opt{nic});
+my ($drive, $mac, $ip, $mask, $gw, $hostname, $nic, $uuid)
+  = ($opt{drive}, $opt{mac}, $opt{ip}, $opt{mask}, $opt{gw}, $opt{hostname}, $opt{nic}, $opt{uuid});
 
 my $h = Sys::Guestfs->new;
 $h->set_trace(1) if $debug;
@@ -70,6 +70,10 @@ my @write_files_content_array = (
 
                  return $content;
                },
+  },    
+  {
+    file    => "/root/.murakumo",
+    content => $uuid,
   },    
   {
     file    => "/etc/sysconfig/network-scripts/ifcfg-$nic",

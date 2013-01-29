@@ -257,6 +257,7 @@ sub clone_for_image {
       # !!!!! まだ ダミー !!!!!
       Murakumo_Node::CLI::Guestfs->new( $config->{guestfs_script_path} )
                                  ->set_network( {
+                                                 uuid     => $dst_uuid,
                                                  ip       => $ip,
                                                  mac      => $mac,
                                                  hostname => $dst_hostname,
