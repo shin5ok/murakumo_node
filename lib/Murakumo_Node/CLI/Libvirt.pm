@@ -38,8 +38,8 @@ sub _connect {
       $conn = Sys::Virt->new;
     }
   } catch {
-    warn "libvirt connection fail exception";
-    warn "message: $@" if $_;
+    warn "libvirt connection fail exception" if is_debug;
+    warn "message: $@" if $_                 if is_debug;
     return undef;
   };
 

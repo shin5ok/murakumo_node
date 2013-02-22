@@ -49,11 +49,11 @@ while ( $pm->signal_received ne 'TERM' ) {
   for my $param ( @params ) {
     $pm->start and next;
     my $c = TheSchwartz->new( databases => [ +{ dsn => 'dbi:SQLite:dbname='. $param->{db_path} } ], verbose => 1, );
-    
+
     $c->can_do( $param->{class} );
     $c->work( 1 );
     $pm->finish;
-  
+
   }
 }
 

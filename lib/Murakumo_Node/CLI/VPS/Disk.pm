@@ -326,7 +326,7 @@ sub make_image_cloning {
   # とりあえず、cp...
   my $cmd = "cp --sparse=auto $src_image_path $dst_image_path";
 
-  warn $cmd;
+  warn $cmd if is_debug;
   my $r = system $cmd;
 
   $r == 0

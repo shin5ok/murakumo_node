@@ -57,7 +57,7 @@ sub is_mounted_storage {
 
 sub add_by_path {
   my ($self, $storage_path) = @_;
-  warn "storage_path : $storage_path";
+  warn "storage_path : $storage_path" if is_debug;
 
   # 先頭から、最初のuuidっぽい文字列を取得
   my ($storage_uuid) = $storage_path =~ m{ / (
@@ -146,9 +146,9 @@ sub mount_nfs_storage {
     $command = sprintf "/bin/umount %s", $data->{mount_path};
 
   }
-                           
-  warn "command: $command";
-  my $result_ref = run_forked( $command, { timeout => 10 } ); 
+
+  warn "command: $command" if is_debug;
+  my $result_ref = run_forked( $command, { timeout => 10 } );
 
  $result_ref->{exit_code} == 0
    or croak "*** nfs mount error($command)";

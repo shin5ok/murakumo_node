@@ -17,9 +17,7 @@ use base qw(Murakumo_Node::CLI::Libvirt);
 sub change {
   my ($self, $uuid, $cdrom_path) = @_;
   $cdrom_path ||= "/dev/null";
-  warn "pre";
   my $r = system "virsh attach-disk --type cdrom $uuid $cdrom_path hdc";
-  warn "after $r";
   return $r == 0;
 }
 

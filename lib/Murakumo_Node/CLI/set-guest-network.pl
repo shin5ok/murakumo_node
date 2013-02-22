@@ -70,15 +70,15 @@ my @write_files_content_array = (
 
                  return $content;
                },
-  },    
+  },
   {
     file    => "/root/.murakumo",
     content => $uuid,
-  },    
+  },
   {
     file    => "/etc/sysconfig/network-scripts/ifcfg-$nic",
     content => make_cfg_content(),
-  },    
+  },
   {
     file    => "/etc/udev/rules.d/70-persistent-cd.rules",
     code    => sub {
@@ -91,7 +91,7 @@ my @write_files_content_array = (
                  my $old_mac;
                  __FILE_LINE__:
                  for my $line ( split /\n/, $content ) {
-                   $line =~ /^\s* #/x 
+                   $line =~ /^\s* #/x
                      or next __FILE_LINE__;
 
                    $line =~ / NAME \s* \= \s* \"? $nic \"? /x

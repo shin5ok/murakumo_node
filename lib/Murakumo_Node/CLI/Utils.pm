@@ -19,10 +19,11 @@ our $log_config_path = qq{/home/smc/murakumo_node/log4perl.conf};
 sub import {
   my $caller = caller;
   no strict 'refs';
-  *{"${caller}::critical"} = \&critical;
-  *{"${caller}::command"}  = \&command;
-  *{"${caller}::dumper"}   = \&dumper;
-  *{"${caller}::logger"}   = \&logger;
+  *{"${caller}::critical"}    = \&critical;
+  *{"${caller}::command"}     = \&command;
+  *{"${caller}::debug_print"} = \&debug_print;
+  *{"${caller}::dumper"}      = \&dumper;
+  *{"${caller}::logger"}      = \&logger;
 }
 
 sub new {
@@ -107,7 +108,7 @@ __PYTHON__
 
 sub command {
   my $command = shift;
-  warn "try command [ $command ]";
+  warn "try command [ $command ]" if is_debug;
   my $r = IPC::Cmd::run(
             command => $command,
             verbose => 1,
@@ -115,6 +116,7 @@ sub command {
           );
   return $r;
 }
+
 
 sub get_api_key {
   my ($self) = @_;

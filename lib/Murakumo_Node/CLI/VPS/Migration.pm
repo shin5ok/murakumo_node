@@ -37,7 +37,7 @@ sub run {
 
   {
     my $api_uri  = sprintf "http://%s:%d/", $dst_node, $config->{api_port};
-    warn "api_uri: $api_uri";
+    warn "api_uri: $api_uri" if is_debug;
 
     require Murakumo_Node::CLI::Remote_JSON_API;
     my $api_response = Murakumo_Node::CLI::Remote_JSON_API

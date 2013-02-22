@@ -23,7 +23,7 @@ our $default_callback_uri = $config->{job_callback_uri};
 
 
 BEGIN {
-  { 
+  {
     no warnings 'redefine';
     use TheSchwartz::Job;
     my $org_job_completed = TheSchwartz::Job->can('completed');
@@ -41,7 +41,7 @@ BEGIN {
       if ( exists $self->arg->{callback_func} ) {
         $self->arg->{callback_func}->();
       }
-                   
+
       $org_job_completed->( @_ );
 
     };
@@ -98,9 +98,11 @@ sub _end_of_job {
 
   my ($job_uuid, $result, $message, $callback_uri) = @_;
 
-  warn "end_of_job argument : ", Dumper \@_;
-  warn "end_of_job argument : ", join ",,", @_;
-  warn "callback uri # ", $callback_uri if $callback_uri;
+  if ( is_debug ) {
+    warn "end_of_job argument : ", Dumper \@_;
+    warn "end_of_job argument : ", join ",,", @_;
+    warn "callback uri # ", $callback_uri if $callback_uri;
+  }
 
   if (! $job_uuid) {
     warn "job uuid is not found... end_of_job() is not working... end.";

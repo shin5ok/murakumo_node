@@ -32,11 +32,11 @@ sub set_network {
   my $command_t = "%s --drive %s --uuid %s --mac %s --ip %s --mask %s --gw %s";
 
   $hostname and
-    $command_t .= " --hostname $hostname";    
+    $command_t .= " --hostname $hostname";
 
-  $nic and 
+  $nic and
     $command_t .= " --nic $nic";
- 
+
   my $command = sprintf $command_t,
                         $self->{script},
                         $drive,
@@ -55,7 +55,7 @@ sub set_network {
             verbose => 1,
             timeout => 50,
           );
-  
+
   if ($r) {
     warn "ok";
     return 1;

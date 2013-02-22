@@ -24,8 +24,9 @@ our $config  = Murakumo_Node::CLI::Utils->config;
 sub add {
   {
     # いまはスタブ
+    # どうやら 必要なさそう
     return 1;
-  } 
+  }
   my ($self, $args_ref) = @_;
   my $xml_data = Murakumo_Node::CLI::Libvirt::XML->new->create_iface_for_libvirt( $args_ref );
   warn __PACKAGE__;
