@@ -19,11 +19,11 @@ our $log_config_path = qq{/home/smc/murakumo_node/log4perl.conf};
 sub import {
   my $caller = caller;
   no strict 'refs';
-  *{"${caller}::critical"}    = \&critical;
-  *{"${caller}::command"}     = \&command;
-  *{"${caller}::debug_print"} = \&debug_print;
-  *{"${caller}::dumper"}      = \&dumper;
-  *{"${caller}::logger"}      = \&logger;
+  *{"${caller}::critical"} = \&critical;
+  *{"${caller}::command"}  = \&command;
+  *{"${caller}::is_debug"} = \&is_debug;
+  *{"${caller}::dumper"}   = \&dumper;
+  *{"${caller}::logger"}   = \&logger;
 }
 
 sub new {
@@ -37,7 +37,7 @@ sub dumper {
   my $file_path = sprintf "/tmp/%s,%s",
                            $package,
                            $line;
-  warn "file_path: ", $file_path;
+  warn "file_path: ", $file_path if is_debug();
   open my $fh, ">", $file_path;
   flock $fh, 2;
   print {$fh}     Dumper($ref);
@@ -83,6 +83,11 @@ sub config {
 
 }
 
+sub is_debug {
+  my @callers = caller;
+  return exists $ENV{DEBUG} and $ENV{DEBUG};
+}
+
 sub create_random_mac {
   my ($self) = @_;
   # python の virtinstモジュールが入っている必要があります
@@ -108,7 +113,7 @@ __PYTHON__
 
 sub command {
   my $command = shift;
-  warn "try command [ $command ]" if is_debug;
+  warn "try command [ $command ]" if is_debug();
   my $r = IPC::Cmd::run(
             command => $command,
             verbose => 1,

@@ -196,11 +196,12 @@ sub clone_for_image {
        $mask,
        $gw,
        $reserve_uuid,
-       $dst_uuid,      
+       $dst_uuid,
        $src_image_path,
        $dst_image_path,
-       $callback_host, 
-       $set_network,   
+       $callback_host,
+       $set_network,
+       $project_id,
       )
       = (
           $argv->{src_uuid},
@@ -215,6 +216,7 @@ sub clone_for_image {
           $argv->{dst_image_path},
           $argv->{callback_host},
           $argv->{set_network},  # nic device name (ex. eth0) 
+          $argv->{project_id},
         );
 
   my $use_public = exists $argv->{public};
@@ -257,14 +259,15 @@ sub clone_for_image {
       # !!!!! まだ ダミー !!!!!
       Murakumo_Node::CLI::Guestfs->new( $config->{guestfs_script_path} )
                                  ->set_network( {
-                                                 uuid     => $dst_uuid,
-                                                 ip       => $ip,
-                                                 mac      => $mac,
-                                                 hostname => $dst_hostname,
-                                                 drive    => $dst_image_path,
-                                                 gw       => $gw,
-                                                 mask     => $mask,
-                                                 nic      => $set_network,
+                                                 uuid       => $dst_uuid,
+                                                 ip         => $ip,
+                                                 mac        => $mac,
+                                                 hostname   => $dst_hostname,
+                                                 drive      => $dst_image_path,
+                                                 gw         => $gw,
+                                                 mask       => $mask,
+                                                 nic        => $set_network,
+                                                 project_id => $project_id,
                                              } )
       or croak "*** set_network is error";
     }
@@ -282,7 +285,7 @@ sub clone_for_image {
   }
 
   return $result;
-  
+
 }
 
 sub _get_date {

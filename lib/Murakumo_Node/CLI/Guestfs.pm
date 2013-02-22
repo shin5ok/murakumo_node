@@ -4,6 +4,9 @@ package Murakumo_Node::CLI::Guestfs 0.03;
 use IPC::Cmd;
 use Carp;
 use Data::Dumper;
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
+use Murakumo_Node::CLI::Utils;
 
 our $script = "/usr/local/bin/set-guest-network.pl";
 
@@ -26,8 +29,8 @@ sub set_network {
 
   my ($self, $p) = @_;
   no strict 'refs';
-  my ($drive, $mac, $ip, $mask, $gw, $hostname, $nic, $uuid)
-    = ($p->{drive}, $p->{mac}, $p->{ip}, $p->{mask}, $p->{gw}, $p->{hostname}, $p->{nic}, $p->{uuid});
+  my ($drive, $mac, $ip, $mask, $gw, $hostname, $nic, $uuid, $project_id)
+    = ($p->{drive}, $p->{mac}, $p->{ip}, $p->{mask}, $p->{gw}, $p->{hostname}, $p->{nic}, $p->{uuid}, $p->{project_id});
 
   my $command_t = "%s --drive %s --uuid %s --mac %s --ip %s --mask %s --gw %s";
 
@@ -36,6 +39,9 @@ sub set_network {
 
   $nic and
     $command_t .= " --nic $nic";
+
+  $project_id and
+    $command_t .= " --project_id $project_id";
 
   my $command = sprintf $command_t,
                         $self->{script},
@@ -57,11 +63,11 @@ sub set_network {
           );
 
   if ($r) {
-    warn "ok";
+    warn "ok" if is_debug;
     return 1;
 
   } else {
-    warn "NG";
+    warn "NG" if is_debug;
     return 0;
 
   }

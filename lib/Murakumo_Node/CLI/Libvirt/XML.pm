@@ -2,15 +2,16 @@ use warnings;
 use strict;
 
 package Murakumo_Node::CLI::Libvirt::XML;
-use FindBin;
-use lib qq{$FindBin::Bin/../lib};
-use Murakumo_Node::CLI::Utils;
 
 use Carp;
 use Data::Dumper;
 use Try::Tiny;
 use Carp;
 use Template;
+
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
+use Murakumo_Node::CLI::Utils;
 
 our $VERSION = q(0.0.1);
 

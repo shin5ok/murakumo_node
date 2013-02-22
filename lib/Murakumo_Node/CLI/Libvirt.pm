@@ -5,6 +5,10 @@ package Murakumo_Node::CLI::Libvirt;
 use Sys::Virt;
 use Try::Tiny;
 
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
+use Murakumo_Node::CLI::Utils;
+
 our $conn;
 
 sub new {
@@ -34,12 +38,12 @@ sub _connect {
     # livemigrationとかで、他のサーバに接続する必要がある場合は、
     # 接続先を指定できるようにするか、別クラスで対応する
     if (! $conn or ref $conn ne 'Sys::Virt') {
-      warn "libvirt connect";
+      warn "libvirt connect" if is_debug;
       $conn = Sys::Virt->new;
     }
   } catch {
     warn "libvirt connection fail exception" if is_debug;
-    warn "message: $@" if $_                 if is_debug;
+    warn "message: $@"                       if is_debug and $_;
     return undef;
   };
 
