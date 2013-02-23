@@ -19,11 +19,12 @@ our $log_config_path = qq{/home/smc/murakumo_node/log4perl.conf};
 sub import {
   my $caller = caller;
   no strict 'refs';
-  *{"${caller}::critical"} = \&critical;
-  *{"${caller}::command"}  = \&command;
-  *{"${caller}::is_debug"} = \&is_debug;
-  *{"${caller}::dumper"}   = \&dumper;
-  *{"${caller}::logger"}   = \&logger;
+  *{"${caller}::critical"}   = \&critical;
+  *{"${caller}::command"}    = \&command;
+  *{"${caller}::remove_set"} = \&remove_set;
+  *{"${caller}::is_debug"}   = \&is_debug;
+  *{"${caller}::dumper"}     = \&dumper;
+  *{"${caller}::logger"}     = \&logger;
 }
 
 sub new {
@@ -144,6 +145,27 @@ sub logger {
   my $level      = shift;
   my $log_string = shift;
   $log->$level( $log_string );
+}
+
+
+sub remove_set {
+  my $disk_path = shift;
+  my $config    = config();
+  warn "remove disk path: $disk_path" if is_debug();
+  if (! -e $disk_path) {
+    warn "*** $disk_path is not found";
+    return 0;
+  }
+
+  my $rename_disk_path = sprintf "%s.%s", $disk_path, $config->{unlink_disk_ext};
+
+  rename $disk_path, $rename_disk_path;
+  {
+    my $uid = $config->{removed_uid} || 99;
+    my $gid = $config->{removed_gid} || 99;
+    chown $uid, $gid, $rename_disk_path;
+  }
+
 }
 
 1;

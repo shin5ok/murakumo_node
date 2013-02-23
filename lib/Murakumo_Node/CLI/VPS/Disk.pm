@@ -103,13 +103,7 @@ sub remove {
       next;
     }
 
-    warn "remove disk path: $disk_path";
-    my $rename_disk_path = sprintf "%s.%s", $disk_path, $config->{unlink_disk_ext};
-
-    -e $disk_path
-      or croak "*** $disk_path is not found";
-
-    rename $disk_path, $rename_disk_path;
+    remove_set( $disk_path );
     -e $disk_path and $fail_count++;
 
   }
@@ -129,7 +123,7 @@ sub remove {
   if ($fail_count == 0) {
     # $callback_params{result} = 1;
     $callback->set_result( 1 );
-  }     
+  }
 
   return $fail_count == 0;
 
