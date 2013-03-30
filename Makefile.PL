@@ -17,9 +17,34 @@ requires 'Moose';
 requires 'namespace::autoclean';
 requires 'Config::General'; # This should reflect the config file format you've chosen
                  # See Catalyst::Plugin::ConfigLoader for supported formats
+
+require 'App::Daemon';
+require 'Config::General';
+require 'DateTime';
+require 'File::Path';
+require 'FindBin';
+require 'HTTP::Request::Common
+require 'IPC::Cmd';
+require 'JSON';
+require 'LWP::UserAgent';
+require 'Log::Log4perl::Catalyst';
+require 'Log::Log4perl';
+require 'Moose';
+require 'Parallel::Prefork';
+require 'Path::Class';
+require 'Storable';
+require 'Sys::Virt';
+require 'Template';
+require 'TheSchwartz::Worker';
+require 'TheSchwartz';
+require 'Try::Tiny';
+require 'XML::TreePP';
+
 test_requires 'Test::More' => '0.88';
 catalyst;
 
 install_script glob('script/*.pl');
 auto_install;
 WriteAll;
+
+
