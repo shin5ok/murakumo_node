@@ -3,8 +3,9 @@
 # description: murakumo_node job
 use strict;
 use warnings;
-
 use File::Basename;
+use Data::Dumper;
+use YAML;
 use Sys::Syslog qw(:DEFAULT setlogsock);
 use Daemon::Generic;
 
@@ -14,7 +15,19 @@ use Storable;
   no warnings;
   $Storable::Eval= 1;
 }
-use lib qw(/home/smc/murakumo_node/lib);
+
+BEGIN {
+  my $yaml = {};
+  eval {
+    $yaml = YAML::LoadFile( "/root/murakumo_node.yaml" );
+  };
+  if (exists $yaml->{murakumo_node_path}) {
+    unshift @INC, qq{$yaml->{murakumo_node_path}/lib};
+  } else {
+    unshift @INC, qq{/home/smc/murakumo_node/lib};
+  }
+};
+
 use Murakumo_Node::CLI::Job;
 use Murakumo_Node::CLI::Utils;
 

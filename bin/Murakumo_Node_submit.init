@@ -19,8 +19,20 @@ use XML::TreePP;
 use Carp;
 use File::Basename;
 use Time::HiRes qw(usleep);
+use YAML;
 
-use lib qw( /home/smc/murakumo_node/lib );
+BEGIN {
+  my $yaml = {};
+  eval {
+    $yaml = YAML::LoadFile( "/root/murakumo_node.yaml" );
+  };
+  if (exists $yaml->{murakumo_node_path}) {
+    unshift @INC, qq{$yaml->{murakumo_node_path}/lib};
+  } else {
+    unshift @INC, qq{/home/smc/murakumo_node/lib};
+  }
+};
+
 use Murakumo_Node::CLI::Utils;
 use Murakumo_Node::CLI::Remote_JSON_API;
 
@@ -228,37 +240,4 @@ sub _gathering_node {
            loadavg   => $loadavg,
          };
 
-}
-
-__END__
-----------------------------------
-[get_uuid_string]
-'e7fb1e93-91bc-197e-5cc7-515664ecf6bf'
-
-[get_name]
-'relay-vm101'
-
-[get_info]
-{
-  'cpuTime' => '110090000000',
-  'memory' => 2097152,
-  'maxMem' => 2097152,
-  'nrVirtCpu' => 2,
-  'state' => 1
-}
-
-----------------------------------
-[get_uuid_string]
-'a10e2c23-fcaa-ed3c-bedb-e3af0f471878'
-
-[get_name]
-'relay-vm000'
-
-[get_info]
-{
-  'cpuTime' => '107940000000',
-  'memory' => 2097152,
-  'maxMem' => 2097152,
-  'nrVirtCpu' => 2,
-  'state' => 1
 }

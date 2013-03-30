@@ -12,13 +12,24 @@ use Sys::Syslog qw(:DEFAULT setlogsock);
 use IPC::Open2;
 use Log::Log4perl;
 use FindBin;
+use YAML;
 
-my $base_path = exists $ENV{MURAKUMO_NODE_PATH}
-              ? $ENV{MURAKUMO_NODE_PATH}
-              : qq{$FindBin::Bin/..};
+our ($config_path, $log_config_path);
+BEGIN {
 
-our $config_path     = qq{$base_path/murakumo_node.conf};
-our $log_config_path = qq{$base_path/log4perl.conf};
+  my $yaml = {};
+  eval {
+    $yaml = YAML::LoadFile( "/root/murakumo_node.yaml" );
+  };
+
+  my $base_path = exists $yaml->{murakumo_node_path}
+                ? $yaml->{murakumo_node_path}
+                : qq{$FindBin::Bin/..};
+
+  our $config_path     = qq{$base_path/murakumo_node.conf};
+  our $log_config_path = qq{$base_path/log4perl.conf};
+
+};
 
 sub import {
   my $caller = caller;
@@ -69,20 +80,11 @@ sub critical {
 }
 
 sub config {
-  my ($self, $config) = @_; 
+  my ($self, $config) = @_;
   $config ||= $config_path;
 
-  my %param;
-  local $@;
-  eval {
-    my $c  = Config::General->new( $config );
-    %param = $c->getall;
-  };
-
-  if ($@) {
-    warn $@;
-    return {};
-  }
+  my $c  = Config::General->new( $config );
+  my %param = $c->getall;
 
   return \%param;
 
