@@ -16,6 +16,7 @@ use YAML;
 
 our ($config_path, $log_config_path);
 BEGIN {
+  my $default_murakumo_node_path = q{/home/smc/murakumo_node};
 
   my $yaml = {};
   eval {
@@ -24,6 +25,8 @@ BEGIN {
 
   my $base_path = exists $yaml->{murakumo_node_path}
                 ? $yaml->{murakumo_node_path}
+                : -d $default_murakumo_node_path
+                ? $default_murakumo_node_path
                 : qq{$FindBin::Bin/..};
 
   our $config_path     = qq{$base_path/murakumo_node.conf};
