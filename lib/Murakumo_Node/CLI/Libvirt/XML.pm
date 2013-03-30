@@ -24,7 +24,7 @@ sub new {
                  config => $config,
                }, $class;
 
-  $obj->{xml_template_dir_path} = sprintf "%s/%s",              
+  $obj->{xml_template_dir_path} = sprintf "%s/%s",
                                           $config->{module_root},
                                           $config->{template_dir_path};
   return $obj;
