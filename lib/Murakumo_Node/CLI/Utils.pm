@@ -20,9 +20,6 @@ my $base_path = exists $ENV{MURAKUMO_NODE_PATH}
 our $config_path     = qq{$base_path/murakumo_node.conf};
 our $log_config_path = qq{$base_path/log4perl.conf};
 
-warn $config_path;
-warn $log_config_path;
-
 sub import {
   my $caller = caller;
   no strict 'refs';
