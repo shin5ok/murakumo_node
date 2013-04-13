@@ -15,7 +15,12 @@ use Murakumo_Node::CLI::Utils;
 
 our $utils  = Murakumo_Node::CLI::Utils->new;
 our $config = $utils->config;
-our $wwwua  = do { my $ua = LWP::UserAgent->new; $ua->timeout(10); $ua };
+our $wwwua  = do {
+                   my $ua = LWP::UserAgent->new;
+                   $ua->timeout(10);
+                   $ua->ssl_opts( verify_hostname => 0, SSL_verify_mode => q{SSL_VERIFY_NONE} );
+                   $ua;
+                 };
 
 sub new {
   my $class   = shift;

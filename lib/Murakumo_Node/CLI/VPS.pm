@@ -85,9 +85,9 @@ sub boot2 {
       disks     
       interfaces
       cpu_number
-      memory    
-      clock     
-      uuid      
+      memory
+      clock
+      uuid
       vnc_password
     );
 
@@ -101,7 +101,7 @@ sub boot2 {
   require Murakumo_Node::CLI::Libvirt::XML;
   my $x = Murakumo_Node::CLI::Libvirt::XML->new;
 
-  my $callback_uri = sprintf "http://%s:3000/vps/boot_tmp_cleanup/", $config->{callback_host};
+  my $callback_uri = sprintf "%s/vps/boot_tmp_cleanup/", $config->{api_uri};
 
   require Murakumo_Node::CLI::Job::Callback;
   my $callback = Murakumo_Node::CLI::Job::Callback->new({ uri => $callback_uri, retry_by_mail => 1, });
@@ -295,7 +295,7 @@ sub make_bridge_and_storage_pool {
 }
 
 sub parse_xml {
-  my $self = shift;  
+  my $self = shift;
   my $file = shift;
 
   my $xml_tpp = XML::TreePP->new( force_array => '*' );
@@ -358,7 +358,6 @@ sub migration {
 
   require Murakumo_Node::CLI::VPS::Migration;
   return &Murakumo_Node::CLI::VPS::Migration::run;
-   
 
 }
 

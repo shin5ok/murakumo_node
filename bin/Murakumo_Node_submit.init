@@ -48,7 +48,7 @@ my $config    = $utils->config;
 my $key       = $utils->get_api_key;
 my $node      = hostname();
 my $web_agent = Murakumo_Node::CLI::Remote_JSON_API->new(
-                                                          qq{http://$config->{callback_host}:3000},
+                                                          $config->{api_uri},
                                                           {
                                                             key       => $key->{api_key},
                                                             node_uuid => $key->{node_uuid},
@@ -105,7 +105,7 @@ sub post_state {
   $node_ref->{cpu_vps_used} = $cpu_vps_used;
   $node_ref->{vps_number}   = scalar @$vps_ref;
   $node_ref->{cpu_available} = $node_ref->{cpu_total} - $cpu_vps_used;
-  
+
   {
     no strict 'refs';
     $parameter->{vpses} = $vps_ref;
@@ -176,7 +176,7 @@ sub _gathering_vps {
             $vnc_port = $xml->{domain}->{devices}->{graphics}->{'-port'};
           }
         }
-        
+
         my @disk_infos = sort { $a->{address}->{'-bus'} cmp $b->{address}->{'-bus'} }
                          grep { exists $_->{source}->{'-file'} }
                               @{$xml->{domain}->{devices}->{disk}};

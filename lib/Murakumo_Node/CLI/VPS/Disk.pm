@@ -59,7 +59,7 @@ sub create {
   }
 
   # デフォルトは commit
-  my $callback_uri = sprintf "http://%s:3000/vps/define/commit/", $config->{callback_host};
+  my $callback_uri = sprintf "%s/vps/define/commit/", $config->{api_uri};
   my $callback     = Murakumo_Node::CLI::Job::Callback->new({
                                                                uri           => $callback_uri,
                                                                retry_by_mail => 1,
@@ -71,7 +71,7 @@ sub create {
                          );
 
   if ($fail_count > 0) {
-    $callback->uri(sprintf "http://%s:3000/vps/define/remove_commit/", $config->{callback_host});
+    $callback->uri(sprintf "%s/vps/define/remove_commit/", $config->{api_uri});
     $callback_params{force_remove} = 1;
 
   }
@@ -107,7 +107,7 @@ sub remove {
     -e $disk_path and $fail_count++;
 
   }
-  my $callback_uri = sprintf "http://%s:3000/vps/define/remove_commit/", $config->{callback_host};
+  my $callback_uri = sprintf "%s/vps/define/remove_commit/", $config->{api_uri};
   my $callback     = Murakumo_Node::CLI::Job::Callback->new({
                                                                uri           => $callback_uri,
                                                                retry_by_mail => 1, 
@@ -193,10 +193,9 @@ sub clone_for_image {
        $dst_uuid,
        $src_image_path,
        $dst_image_path,
-       $callback_host,
        $set_network,
        $project_id,
-      )
+     )
       = (
           $argv->{src_uuid},
           $argv->{dst_hostname},
@@ -208,15 +207,13 @@ sub clone_for_image {
           $argv->{dst_uuid},
           $argv->{src_image_path},
           $argv->{dst_image_path},
-          $argv->{callback_host},
           $argv->{set_network},  # nic device name (ex. eth0) 
           $argv->{project_id},
         );
 
   my $use_public = exists $argv->{public};
 
-  $callback_host ||= $config->{callback_host};
-  my $callback_uri = sprintf "http://%s:3000/vps/define/commit/", $callback_host;
+  my $callback_uri = sprintf "%s:3000/vps/define/commit/", $config->{api_uri};
   my $callback     = Murakumo_Node::CLI::Job::Callback->new({
                                                                uri           => $callback_uri,
                                                                retry_by_mail => 1,,
