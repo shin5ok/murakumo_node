@@ -38,7 +38,7 @@ use Murakumo_Node::CLI::Remote_JSON_API;
 
 my $progname = "murakumo_node_submit";
 
-$App::Daemon::kill_sig = SIGINT;
+$App::Daemon::kill_sig = SIGTERM;
 $App::Daemon::pidfile  = "/var/run/" . $progname . ".pid";
 $App::Daemon::logfile  = "/var/log/" . $progname . ".log";
 $App::Daemon::as_user  = "root";

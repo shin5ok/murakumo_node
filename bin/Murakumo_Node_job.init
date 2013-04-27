@@ -7,7 +7,9 @@ use File::Basename;
 use Data::Dumper;
 use YAML;
 use Sys::Syslog qw(:DEFAULT setlogsock);
-use Daemon::Generic;
+use App::Daemon qw( daemonize );
+use Parallel::Prefork;
+use POSIX;
 
 use TheSchwartz;
 use Storable;
@@ -34,33 +36,51 @@ use Murakumo_Node::CLI::Utils;
 my $config  = Murakumo_Node::CLI::Utils->config;
 my $db_path  = $config->{job_db_path};
 my $progname = "murakumo_node_job";
-
 my $sleep = 1;
-if ( $0 =~ /retry/i ) {
-  $db_path  = $config->{retry_db_path};
-  $progname = "murakumo_node_retry";
-  $sleep    = 30;
-}
 
 $0 = $progname;
-newdaemon(
-  progname   => $progname,
-  pidfile    => '/var/run/' .  $progname . ".pid",
-);
 
-sub gd_preconfig {}
-
-sub gd_run {
-
+sub work {
   $0 = "$0 ( $db_path )";
   my $c = TheSchwartz->new( databases => [ +{ dsn => 'dbi:SQLite:dbname='. $db_path, } ], verbose => 0, );
-  
+
   eval qq{use Murakumo_Node::CLI::Job::Work;};
   $c->can_do('Murakumo_Node::CLI::Job::Work');
-  
+
   $c->work( $sleep );
+}
+
+sub run {
+
+  no strict 'refs';
+  my $job_worker_number = $config->{job_worker_number} || 1;
+  my %params = (
+    max_workers  => $job_worker_number,
+    trap_signals => {
+                      TERM => 'TERM',
+                      HUP  => 'TERM',
+                    },
+  );
+
+  my $pm = Parallel::Prefork->new( \%params );
+
+  while ($pm->signal_received ne 'TERM') {
+    $pm->start and next;
+    work();
+    $pm->finish;
+  }
+
+  $pm->wait_all_children;
 
 }
 
-1;
+$App::Daemon::kill_sig = SIGTERM;
+$App::Daemon::pidfile  = "/var/run/" . $progname . ".pid";
+$App::Daemon::logfile  = "/var/log/" . $progname . ".log";
+$App::Daemon::as_user  = "root";
 
+daemonize;
+run ();
+
+
+1;
