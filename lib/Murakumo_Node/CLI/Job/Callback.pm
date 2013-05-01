@@ -8,6 +8,9 @@ use Data::Dumper;
 use Sys::Hostname;
 use Carp;
 
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
+use Murakumo_Node::CLI::Utils;
 
 sub new {
   my $class    = shift;
@@ -55,7 +58,7 @@ sub set_params {
 sub set_result {
   my $self  = shift;
   my $value = shift;
-  { 
+  {
     no strict 'refs';
     $self->{params}->{result} = $value;
   }
@@ -78,10 +81,12 @@ sub call {
     my $arg_ref          = shift;
     my ( $uri, $params ) = @$arg_ref;
 
-    warn "--- CALLBACK called ---------";
-    warn "uri: " . $uri;
-    warn Dumper $params;
-    warn "-----------------------------";
+    if ( is_debug ) {
+      warn "--- CALLBACK called ---------";
+      warn "uri: " . $uri;
+      warn Dumper $params;
+      warn "-----------------------------";
+    }
 
     require Murakumo_Node::CLI::Remote_JSON_API;
     my $api = Murakumo_Node::CLI::Remote_JSON_API->new;

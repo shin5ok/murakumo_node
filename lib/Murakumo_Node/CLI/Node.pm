@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-package Murakumo_Node::CLI::Node;
+package Murakumo_Node::CLI::Node 0.02;
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Libvirt;
@@ -10,8 +10,6 @@ use base q(Murakumo_Node::CLI::Libvirt);
 use Carp;
 use Data::Dumper;
 use Try::Tiny;
-
-our $VERSION = q(0.0.1);
 
 sub list_vps_ids {
   my $self = shift;

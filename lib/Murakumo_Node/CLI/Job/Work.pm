@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Murakumo_Node::CLI::Job::Work;
+package Murakumo_Node::CLI::Job::Work 0.01;
 
 use TheSchwartz::Worker;
 use base q(TheSchwartz::Worker);
@@ -13,8 +13,6 @@ use HTTP::Request::Common qw( POST );
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
-
-our $VERSION = q(0.0.1);
 
 our $class_dir_path = sprintf "%s::", __PACKAGE__;
 our %works;

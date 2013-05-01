@@ -189,8 +189,9 @@ sub clone :Local {
 
   my $r = $job_model->register('VPS::Clone', $params);
   if ($r) {
-    $c->stash->{result} = 1;
+    local $Data::Dumper::Terse = 1;
     $c->log->info("vps clone job " . Dumper $params);
+    $c->stash->{result} = 1;
   } else {
     $c->stash->{error} = $@;
   }

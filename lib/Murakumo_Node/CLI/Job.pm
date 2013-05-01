@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Murakumo_Node::CLI::Job;
+package Murakumo_Node::CLI::Job 0.01;
 
 use TheSchwartz;
 use Carp;

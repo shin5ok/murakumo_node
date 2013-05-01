@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Murakumo_Node::CLI::Job::Work::VPS::Shutdown;
+package Murakumo_Node::CLI::Job::Work::VPS::Shutdown 0.01;
 use Carp;
 
 use FindBin;

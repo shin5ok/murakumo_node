@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-package Murakumo_Node::CLI::Libvirt;
+package Murakumo_Node::CLI::Libvirt 0.01;
 
 use Sys::Virt;
 use Try::Tiny;

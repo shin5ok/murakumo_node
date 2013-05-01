@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-package Murakumo_Node::CLI::Libvirt::IFace;
+package Murakumo_Node::CLI::Libvirt::IFace 0.01;
 use Carp;
 use XML::TreePP;
 use Try::Tiny;
@@ -18,7 +18,6 @@ use base q(Murakumo_Node::CLI::Libvirt);
 use Murakumo_Node::CLI::Libvirt::XML;
 use Murakumo_Node::CLI::Utils;
 
-our $VERSION = q(0.0.1);
 our $config  = Murakumo_Node::CLI::Utils->config;
 
 sub add {
@@ -29,9 +28,8 @@ sub add {
   }
   my ($self, $args_ref) = @_;
   my $xml_data = Murakumo_Node::CLI::Libvirt::XML->new->create_iface_for_libvirt( $args_ref );
-  warn __PACKAGE__;
-  warn $xml_data;
 
+  warn $xml_data if is_debug;
   $self->conn->create_network( $xml_data );
 }
 
@@ -63,7 +61,8 @@ sub make_br_and_vlan {
 
     if (! -e $vl_f->absolute) {
       my $command = "/sbin/vconfig add $nic $vlan_id";
-      warn $command;
+
+      warn $command if is_debug;
       my $r = command( $command );
       if (! $r) {
         croak "*** fail command( $command )";

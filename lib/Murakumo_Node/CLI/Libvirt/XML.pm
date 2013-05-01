@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-package Murakumo_Node::CLI::Libvirt::XML;
+package Murakumo_Node::CLI::Libvirt::XML 0.01;
 
 use Carp;
 use Data::Dumper;
@@ -12,8 +12,6 @@ use Template;
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
-
-our $VERSION = q(0.0.1);
 
 sub new {
   my $class  = shift;

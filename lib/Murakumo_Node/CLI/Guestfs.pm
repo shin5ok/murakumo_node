@@ -52,9 +52,8 @@ sub set_network {
                         $mask,
                         $gw,
                         $hostname;
-  warn "[ $command ]";
 
-  # $IPC::Cmd::VERBOSE = 1;
+  warn "[ $command ]" if is_debug;
 
   my $r = IPC::Cmd::run(
             command => $command,

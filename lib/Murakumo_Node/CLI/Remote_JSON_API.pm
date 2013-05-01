@@ -17,7 +17,7 @@ our $utils  = Murakumo_Node::CLI::Utils->new;
 our $config = $utils->config;
 our $wwwua  = do {
                    my $ua = LWP::UserAgent->new;
-                   $ua->timeout(10);
+                   $ua->timeout(30);
                    $ua->ssl_opts( verify_hostname => 0, SSL_verify_mode => q{SSL_VERIFY_NONE} );
                    $ua;
                  };
@@ -142,11 +142,7 @@ sub post {
 
   my $request = POST $uri, [ %$params ];
   my $response = $wwwua->request( $request );
-  # warn "----- post ---------------";
-  # warn $response->content;
-  # warn "--------------------------";
 
-  # warn $response;
   return $response;
 
 }

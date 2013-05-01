@@ -5,9 +5,6 @@ use Carp;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
-
-use FindBin;
-use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
 
 my $config = Murakumo_Node::CLI::Utils->config;

@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Murakumo_Node::CLI::Libvirt::Storage 0.03;
+
 use FindBin;
 use Carp;
 use Data::Dumper;
@@ -39,7 +40,6 @@ sub del {
 
 sub is_mounted_storage {
   my ($self, $uuid) = @_;
-  my $mount   = `/bin/mount`;
   open my $mounts, "<", "/proc/mounts";
   my $mounted = 0;
   while (my $line = <$mounts>) {
@@ -61,12 +61,12 @@ sub add_by_path {
 
   # 先頭から、最初のuuidっぽい文字列を取得
   my ($storage_uuid) = $storage_path =~ m{ / (
-                                             [0-9a-z]{8} \-
-                                             [0-9a-z]{4} \-
-                                             [0-9a-z]{4} \-
-                                             [0-9a-z]{4} \-
-                                             [0-9a-z]{12}
-                                           ) / }xoms;
+                                             [0-9a-f]{8} \-
+                                             [0-9a-f]{4} \-
+                                             [0-9a-f]{4} \-
+                                             [0-9a-f]{4} \-
+                                             [0-9a-f]{12}
+                                           ) / }xomis;
 
   if (! $storage_uuid ) {
     logger "*** like uuid get from $storage_path is failure";
@@ -87,7 +87,9 @@ sub add {
 
   }
 
-  my $api_response = Murakumo_Node::CLI::Remote_JSON_API->new->get("/storage/info/", { uuid => $uuid });
+  my $api_response = Murakumo_Node::CLI::Remote_JSON_API->new
+                                                        ->get("/storage/info/", { uuid => $uuid });
+
   my $api_result   = decode_json $api_response->content;
   if (exists $api_result->{result} and $api_result->{result} == 1) {
     no strict 'refs';

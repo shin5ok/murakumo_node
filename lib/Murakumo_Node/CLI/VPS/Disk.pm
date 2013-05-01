@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-package Murakumo_Node::CLI::VPS::Disk;
+package Murakumo_Node::CLI::VPS::Disk 0.05;
 use Path::Class;
 use Carp;
 use IPC::Open3;
