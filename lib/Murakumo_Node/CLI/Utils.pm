@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+
 package Murakumo_Node::CLI::Utils 0.05;
 use URI;
 use JSON;
@@ -46,7 +47,8 @@ sub import {
 }
 
 sub new {
-  bless {}
+  my $class = shift;
+  bless {}, $class;
 }
 
 sub dumper {

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-package Murakumo_Node::CLI::Job::Callback;
+
+package Murakumo_Node::CLI::Job::Callback 0.01;
 use LWP::UserAgent;
 use JSON;
 use HTTP::Request::Common qw(POST GET);

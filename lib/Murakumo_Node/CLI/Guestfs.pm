@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+
 package Murakumo_Node::CLI::Guestfs 0.03;
 use IPC::Cmd;
 use Carp;

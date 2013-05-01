@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+
 package Murakumo_Node::CLI::Mail_API;
 use Carp;
 use JSON;

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Murakumo_Node::CLI::Job::Work::VPS::Clone;
+
+package Murakumo_Node::CLI::Job::Work::VPS::Clone 0.05;
 use Carp;
 use Data::Dumper;
-
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Murakumo_Node::CLI::Job::Work::Retry;
-use Carp;
 
+package Murakumo_Node::CLI::Job::Work::Retry 0.01;
+use Carp;
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;

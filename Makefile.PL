@@ -18,27 +18,28 @@ requires 'namespace::autoclean';
 requires 'Config::General'; # This should reflect the config file format you've chosen
                  # See Catalyst::Plugin::ConfigLoader for supported formats
 
-require 'App::Daemon';
-require 'Config::General';
-require 'DateTime';
-require 'File::Path';
-require 'FindBin';
-require 'HTTP::Request::Common
-require 'IPC::Cmd';
-require 'JSON';
-require 'LWP::UserAgent';
-require 'Log::Log4perl::Catalyst';
-require 'Log::Log4perl';
-require 'Moose';
-require 'Parallel::Prefork';
-require 'Path::Class';
-require 'Storable';
-require 'Sys::Virt';
-require 'Template';
-require 'TheSchwartz::Worker';
-require 'TheSchwartz';
-require 'Try::Tiny';
-require 'XML::TreePP';
+requires 'App::Daemon';
+requires 'Config::General';
+requires 'DateTime';
+requires 'File::Path';
+requires 'FindBin';
+requires 'HTTP::Request::Common
+requires 'IPC::Cmd';
+requires 'JSON';
+requires 'LWP::UserAgent';
+requires 'Log::Log4perl::Catalyst';
+requires 'Log::Log4perl';
+requires 'Moose';
+requires 'Parallel::Prefork';
+requires 'Path::Class';
+requires 'Storable';
+requires 'Sys::Virt';
+requires 'Template';
+requires 'TheSchwartz::Worker';
+requires 'TheSchwartz';
+requires 'Parallel::Prefork';
+requires 'Try::Tiny';
+requires 'XML::TreePP';
 
 test_requires 'Test::More' => '0.88';
 catalyst;
