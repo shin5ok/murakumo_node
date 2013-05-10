@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 package Murakumo_Node::CLI::Job::Work::VPS::Migration 0.01;
+
 use Carp;
 use Data::Dumper;
 

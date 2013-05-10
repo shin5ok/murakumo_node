@@ -125,8 +125,10 @@ sub json_post {
   my $response;
   eval {
     $response = $wwwua->request( $request );
-    warn $response->code;
-    warn $response->content;
+    if (is_debug) {
+      warn $response->code;
+      warn $response->content;
+    }
   };
   return $response;
 
@@ -146,30 +148,5 @@ sub post {
   return $response;
 
 }
-
-
-
-__END__
-496 sub _www_get {
-497   my $wwwua = LWP::UserAgent->new;
-498   $wwwua->timeout( 10 );
-499   my ($uri_string, %param) = @_;
-500   my $uri = URI->new( $uri_string );
-501   %param and $uri->query_form( \%param );
-502
-503   return $wwwua->get( $uri );
-504 }
-505
-506 sub _www_post {
-507   my $uri   = shift;
-508   my $param = shift;
-509   my $wwwua = LWP::UserAgent->new;
-510   $wwwua->timeout( 10 );
-511   my $request = POST $uri, [ $param ];
-512   warn Dumper $request;
-513   return $wwwua->request( $request );
-514 }
-
-
 
 1;
