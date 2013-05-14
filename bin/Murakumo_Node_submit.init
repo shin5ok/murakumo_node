@@ -162,8 +162,11 @@ sub _gathering_vps {
   my @parameters;
   eval {
     for my $dom ($vmm->list_domains) {
-      my $uuid = $dom->get_uuid_string;
       my $info = $dom->get_info;
+      if ($info->{state} != 1) {
+        next;
+      }
+      my $uuid = $dom->get_uuid_string;
       my $name = $dom->get_name;
       my $xml  = XML::TreePP->new( force_array => 'disk' )->parse( $dom->get_xml_description );
 
