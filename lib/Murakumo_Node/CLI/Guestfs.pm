@@ -54,7 +54,7 @@ sub set_network {
                         $gw,
                         $hostname;
 
-  warn "[ $command ]" if is_debug;
+  logging $command;
 
   my $r = IPC::Cmd::run(
             command => $command,
@@ -63,11 +63,11 @@ sub set_network {
           );
 
   if ($r) {
-    warn "ok" if is_debug;
+    logging "set_network ok";
     return 1;
 
   } else {
-    warn "NG" if is_debug;
+    logging "set_network NG";
     return 0;
 
   }

@@ -283,7 +283,7 @@ sub make_bridge_and_storage_pool {
     my $libvirt_storage = Murakumo_Node::CLI::Libvirt::Storage->new;
     for my $storage_path ( @{$hash_ref->{storage}} ) {
       if (! $libvirt_storage->add_by_path( $storage_path )) {
-        logger "add_by_path $storage_path failure";
+        logging "add_by_path $storage_path failure";
         $fail_count++;
         next;
       }

@@ -69,7 +69,7 @@ sub add_by_path {
                                            ) / }xomis;
 
   if (! $storage_uuid ) {
-    logger "*** like uuid get from $storage_path is failure";
+    logging "*** like uuid get from $storage_path is failure";
     return 0;
   }
 

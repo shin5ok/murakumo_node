@@ -47,7 +47,7 @@ sub create {
     my $disk_size = $disk_param->{size};
 
     if (! $libvirt_storage->add_by_path( $disk_path )) {
-      logger "add_by_path $disk_path failure";
+      logging "add_by_path $disk_path failure";
       $fail_count++;
       next;
     }
@@ -98,7 +98,7 @@ sub remove {
   for my $disk_path ( @$disks ) {
 
     if (! $libvirt_storage->add_by_path( $disk_path )) {
-      logger "add_by_path ( $disk_path ) failure";
+      logging "add_by_path ( $disk_path ) failure";
       $fail_count++;
       next;
     }
@@ -154,7 +154,7 @@ sub _disk_make {
   _path_make( $file_path );
 
   my $command   = sprintf "qemu-img create -f raw %s %dK", $file_path, $file_size;
-  warn $command;
+  logging $command;
   my $disk_make = run(
                        command => $command,
                        timeout => 600,
@@ -270,9 +270,14 @@ sub clone_for_image {
   if ($@) {
     # 失敗した場合の後片付け
     unlink $dst_image_path;
+    logging "cleanup disk $dst_image_path";
+
   } else {
     $result = 1;
     $callback->set_result( $result );
+    logging "clone complete";
+    logging "create $dst_uuid from $src_uuid finished";
+
   }
 
   return $result;
@@ -320,7 +325,7 @@ sub make_image_cloning {
   # とりあえず、cp...
   my $cmd = "cp --sparse=auto $src_image_path $dst_image_path";
 
-  warn $cmd if is_debug;
+  logging $cmd;
   my $r = system $cmd;
 
   $r == 0

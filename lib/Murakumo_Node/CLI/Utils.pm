@@ -43,7 +43,7 @@ sub import {
   *{"${caller}::remove_set"} = \&remove_set;
   *{"${caller}::is_debug"}   = \&is_debug;
   *{"${caller}::dumper"}     = \&dumper;
-  *{"${caller}::logger"}     = \&logger;
+  *{"${caller}::logging"}    = \&logging;
 }
 
 sub new {
@@ -149,12 +149,14 @@ sub get_api_key {
 
 }
 
-
-sub logger {
+sub logging {
   Log::Log4perl::init( $log_config_path );
   my $log = Log::Log4perl->get_logger;
-  my $level      = shift;
-  my $log_string = shift;
+
+  my ($level, $log_string) = @_ < 2
+                           ? (q{info}, $_[0])
+                           : @_;
+
   $log->$level( $log_string );
 }
 
