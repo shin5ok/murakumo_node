@@ -47,7 +47,7 @@ sub boot_from_json :Local {
 
   {
     no strict 'refs';
-    for my $param_name ( qw( job_uuid uuid ) ) {
+    for my $param_name ( qw( job_uuid ) ) {
       exists $params->{$param_name}
         or $c->detach("/stop_error", ["*** $param_name is missing..."]);
     }
