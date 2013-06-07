@@ -207,13 +207,16 @@ sub clone_for_image {
           $argv->{dst_uuid},
           $argv->{src_image_path},
           $argv->{dst_image_path},
-          $argv->{set_network},  # nic device name (ex. eth0) 
+          $argv->{set_network},    # nic device name (ex. eth0)
           $argv->{project_id},
         );
 
   my $use_public = exists $argv->{public};
 
-  my $callback_uri = sprintf "%s:3000/vps/define/commit/", $config->{api_uri};
+  my $api_uri = $config->{api_uri};
+     $api_uri =~ s{/\s*$}{};
+
+  my $callback_uri = sprintf "%s:%d/vps/define/commit/", $api_uri, $config->{api_port};
   my $callback     = Murakumo_Node::CLI::Job::Callback->new({
                                                                uri           => $callback_uri,
                                                                retry_by_mail => 1,,
