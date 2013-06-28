@@ -42,7 +42,7 @@ $0 = $progname;
 
 sub work {
   $0 = "$0 ( $db_path )";
-  my $c = TheSchwartz->new( databases => [ +{ dsn => 'dbi:SQLite:dbname='. $db_path, } ], verbose => 0, );
+  my $c = TheSchwartz->new( databases => [ +{ dsn => 'dbi:SQLite:dbname='. $db_path, } ], verbose => 1, );
 
   eval qq{use Murakumo_Node::CLI::Job::Work;};
   $c->can_do('Murakumo_Node::CLI::Job::Work');

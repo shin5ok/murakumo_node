@@ -26,7 +26,6 @@ require Murakumo_Node::CLI::Job::Callback;
 
 our $utils   = Murakumo_Node::CLI::Utils->new;
 our $config  = $utils->config;
-our $vm_root = $config->{vm_root};
 
 our $qemu_img_cmd = "/usr/bin/qemu-img";
 
@@ -273,6 +272,7 @@ sub clone_for_image {
   if ($@) {
     # 失敗した場合の後片付け
     unlink $dst_image_path;
+    logging Dumper $@;
     logging "cleanup disk $dst_image_path";
 
   } else {
@@ -325,14 +325,18 @@ sub make_image_cloning {
 
   _path_make( $dst_image_path );
 
-  # とりあえず、cp...
-  my $cmd = "cp --sparse=auto $src_image_path $dst_image_path";
+  require Murakumo_Node::CLI::VPS::Disk::Copy;
+  Murakumo_Node::CLI::VPS::Disk::Copy
+    ->new({ src => $src_image_path, dst => $dst_image_path })
+    ->find_stock_image_and_copy;
 
-  logging $cmd;
-  my $r = system $cmd;
+  # # とりあえず、cp...
+  # my $cmd = "cp --sparse=auto $src_image_path $dst_image_path";
 
-  $r == 0
-     or croak "*** make image: $cmd";
+  # logging $cmd;
+  # my $r = system $cmd;
+
+  # $r or croak "*** make image: $cmd";
 
   return 1;
 

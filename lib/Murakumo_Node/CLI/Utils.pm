@@ -158,6 +158,8 @@ sub logging {
                            : @_;
 
   $log->$level( $log_string );
+  warn $log_string if is_debug;
+
 }
 
 
