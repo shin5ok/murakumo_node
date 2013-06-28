@@ -79,6 +79,12 @@ $App::Daemon::pidfile  = "/var/run/" . $progname . ".pid";
 $App::Daemon::logfile  = "/var/log/" . $progname . ".log";
 $App::Daemon::as_user  = "root";
 
+local $SIG{__WARN__} = sub {
+  my $string = shift;
+  logging $string;
+  CORE::warn $string;
+};
+
 daemonize;
 run ();
 

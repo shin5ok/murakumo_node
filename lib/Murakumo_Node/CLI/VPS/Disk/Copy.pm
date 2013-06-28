@@ -53,6 +53,7 @@ sub find_stock_image_and_copy {
         next;
       }
 
+      warn sprintf "rename %s => %s", $file, $self->dst;;
       rename $file, $self->dst
         or croak "*** rename error";
 

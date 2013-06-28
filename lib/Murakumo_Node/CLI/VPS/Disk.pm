@@ -330,15 +330,9 @@ sub make_image_cloning {
     ->new({ src => $src_image_path, dst => $dst_image_path })
     ->find_stock_image_and_copy;
 
-  # # とりあえず、cp...
-  # my $cmd = "cp --sparse=auto $src_image_path $dst_image_path";
-
-  # logging $cmd;
-  # my $r = system $cmd;
-
-  # $r or croak "*** make image: $cmd";
-
   return 1;
 
 }
+
 1;
+
