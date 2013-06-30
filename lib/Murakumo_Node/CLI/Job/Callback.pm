@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use 5.014;
 
 package Murakumo_Node::CLI::Job::Callback 0.01;
 use LWP::UserAgent;
@@ -15,7 +16,7 @@ use Murakumo_Node::CLI::Utils;
 
 sub new {
   my $class    = shift;
-  my $args_ref = shift;
+  my $args_ref = shift // +{};
 
   my $obj = bless $args_ref, $class;
 

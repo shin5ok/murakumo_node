@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use 5.014;
 
 package Murakumo_Node::CLI::Node 0.02;
 use FindBin;
@@ -15,7 +16,6 @@ sub list_vps_ids {
   my $self = shift;
   my @ids;
 
-  # vpsのリストを更新
   $self->_reload_list_domains;
   for my $domain_obj ( @{$self->{_domains}} ) {
     push @ids, $domain_obj->get_id;
@@ -26,7 +26,6 @@ sub list_vps_ids {
 sub list_vps_uuids {
   my $self = shift;
   my @uuids;
-  # vpsのリストを更新
   $self->_reload_list_domains;
   for my $domain_obj ( @{$self->{_domains}} ) {
     push @uuids, $domain_obj->get_uuid_string;

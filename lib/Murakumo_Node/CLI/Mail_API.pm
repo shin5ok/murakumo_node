@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use 5.014;
 
 package Murakumo_Node::CLI::Mail_API;
 use Carp;

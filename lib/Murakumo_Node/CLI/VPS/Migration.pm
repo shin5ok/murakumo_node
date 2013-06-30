@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use 5.014;
 
 package Murakumo_Node::CLI::VPS::Migration 0.01;
 use Carp;
@@ -15,7 +16,6 @@ use base qw(Murakumo_Node::CLI::Libvirt);
 
 our $utils   = Murakumo_Node::CLI::Utils->new;
 our $config  = $utils->config;
-our $vm_root = $config->{vm_root};
 
 sub run {
   my ($self, $argv) = @_;

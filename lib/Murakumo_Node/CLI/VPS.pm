@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use 5.014;
 
 package Murakumo_Node::CLI::VPS 0.05;
 use XML::TreePP;
@@ -135,7 +136,7 @@ sub boot2 {
       };
 
       my $xml_data = $x->create_interface_xml( $r );
-      
+
       push @interfaces, $xml_data;
       push @ready_brs,  $bridge;
 
@@ -187,9 +188,9 @@ sub boot2 {
         disk_cache => $disk_cache,
       };
       $controller and $r->{controller} = $controller;
-      
+
       my $xml_data = $x->create_disk_xml( $r );
-      
+
       push @disks, $xml_data;
       push @ready_storage_pools, $disk->{image_path};
 
@@ -199,9 +200,9 @@ sub boot2 {
 
     my $vps_xml_data;
     {
-    
+
       my $uuid = $vps_params->{uuid};
-    
+
       my $r = {
         name       => $vps_params->{name},
         uuid       => $vps_params->{uuid},
@@ -217,7 +218,6 @@ sub boot2 {
       exists $vps_params->{vnc_password}
         and $r->{vnc_password} = $vps_params->{vnc_password};
 
-      
       $vps_xml_data = $x->create_vps_xml( $r, \@disks, \@interfaces, );
 
     }

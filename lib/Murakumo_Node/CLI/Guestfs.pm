@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use 5.014;
 
 package Murakumo_Node::CLI::Guestfs 0.03;
 use IPC::Cmd;
@@ -16,7 +17,7 @@ sub new {
   my $script_path = shift;
   $script_path ||= $script;
 
-  my $obj = bless {};
+  my $obj = bless {}, $class;
   $obj->{script} = $script_path;
 
   -x $obj->{script}

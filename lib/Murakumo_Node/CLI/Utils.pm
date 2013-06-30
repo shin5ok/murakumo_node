@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use 5.014;
 
 package Murakumo_Node::CLI::Utils 0.05;
 use URI;

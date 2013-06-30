@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use 5.014;
 
 package Murakumo_Node::CLI::VPS::Disk 0.05;
 use Path::Class;
@@ -20,6 +21,7 @@ use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Guestfs;
 use Murakumo_Node::CLI::Utils;
+# もうサブクラス化はやめていい
 use Murakumo_Node::CLI::Libvirt;
 use base qw(Murakumo_Node::CLI::Libvirt);
 require Murakumo_Node::CLI::Job::Callback;
@@ -27,7 +29,9 @@ require Murakumo_Node::CLI::Job::Callback;
 our $utils   = Murakumo_Node::CLI::Utils->new;
 our $config  = $utils->config;
 
-our $qemu_img_cmd = "/usr/bin/qemu-img";
+our $qemu_img_cmd = exists $config->{qemu_img_command_path}
+                  ? $config->{qemu_img_command_path}
+                  : "/usr/bin/qemu-img";
 
 sub create {
   my ($self, $params) = @_;

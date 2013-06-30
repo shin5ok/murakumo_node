@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use 5.014;
 
 package Murakumo_Node::CLI::Job::Work::Retry 0.01;
 use Carp;

@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use 5.014;
 
 package Murakumo_Node::CLI::Job::Work::VPS::Migration 0.01;
 
@@ -9,7 +10,6 @@ use Data::Dumper;
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 
-# boot部分を作る
 sub work {
   my ($self, $job) = @_;
 

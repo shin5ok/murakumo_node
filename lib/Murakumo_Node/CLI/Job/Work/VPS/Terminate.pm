@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use 5.014;
 
 package Murakumo_Node::CLI::Job::Work::VPS::Terminate 0.01;
 use Carp;
