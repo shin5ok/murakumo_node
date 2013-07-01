@@ -1,3 +1,3 @@
 murakumo_node
 =============
-Very simple Cloud node Agent for murakumo.
+Simple Cloud Node Agent for murakumo.
