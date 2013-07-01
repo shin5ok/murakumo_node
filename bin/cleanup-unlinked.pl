@@ -9,6 +9,8 @@ use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Utils;
 
+my $config = Murakumo_Node::CLI::Utils->config;
+
 opts my $test => { isa => 'Bool' },
      my $mday => { isa => 'Int', default => 7 };
 my @dirs = @ARGV;
@@ -25,7 +27,18 @@ for my $dir ( @dirs ) {
 
 sub cleanup {
   my $file = $File::Find::name;
-  if (-f $file and $file =~ /\.unlinked$/) {
+  my $ext  = exists $config->{unlink_disk_ext}
+           ? $config->{unlink_disk_ext}
+           : q{unlinked};
+
+  if ($ext =~ /^\s*$/) {
+    croak "*** critical error...cleanup ext is empty";
+  }
+  if ($ext !~ /[a-z0-9\-\_]{2}/i) {
+    croak "*** critical error...cleanup ext is invalid";
+  }
+
+  if (-f $file and $file =~ /\.img\.${ext}$/) {
     if (-M $file > $mday) {
       my $log = "try $file is removed";
       if ($test) {
