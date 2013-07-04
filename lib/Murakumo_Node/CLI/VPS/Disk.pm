@@ -21,7 +21,7 @@ use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo_Node::CLI::Guestfs;
 use Murakumo_Node::CLI::Utils;
-# もうサブクラス化はやめていい
+# もうサブクラスにする必要ない
 use Murakumo_Node::CLI::Libvirt;
 use base qw(Murakumo_Node::CLI::Libvirt);
 require Murakumo_Node::CLI::Job::Callback;

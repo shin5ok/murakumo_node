@@ -54,12 +54,14 @@ sub find_stock_image_and_copy {
         next;
       }
 
-      warn sprintf "rename %s => %s", $file, $self->dst;;
-      rename $file, $self->dst
-        or croak "*** rename error";
-
-      return 1;
-
+      warn sprintf "rename %s => %s", $file, $self->dst;
+      if (rename $file, $self->dst) {
+        warn "rename ok";
+        return 1;
+      } else {
+        warn "rename failure...maybe destination image on another storage ?";
+        warn "then, continue to try copy process...";
+      }
     }
   }
 
