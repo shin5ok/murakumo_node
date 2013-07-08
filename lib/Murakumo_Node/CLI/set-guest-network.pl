@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# /etc 以下の設定ファイルの書き換え
+# packageで提供されているperlを利用します
 use warnings;
 use strict;
 use Sys::Guestfs;
@@ -8,7 +8,18 @@ use Getopt::Long;
 use Carp;
 
 my %opt;
-GetOptions( \%opt, "drive=s", "uuid=s", "mac=s", "ip=s", "mask=s", "gw=s", "hostname=s", "nic=s", "project_id=s" );
+GetOptions(
+            \%opt,
+            "drive=s",
+            "uuid=s",
+            "mac=s",
+            "ip=s",
+            "mask=s",
+            "gw=s",
+            "hostname=s",
+            "nic=s",
+            "project_id=s",
+          );
 
 my $debug = exists $ENV{DEBUG};
 warn Dumper \@ARGV if $debug;
@@ -25,8 +36,28 @@ if ($opt{nic} !~ /^eth\d+/) {
 defined $opt{nic}
   or $opt{nic} = "eth0";
 
-my ($drive, $mac, $ip, $mask, $gw, $hostname, $nic, $uuid, $project_id)
-  = ($opt{drive}, $opt{mac}, $opt{ip}, $opt{mask}, $opt{gw}, $opt{hostname}, $opt{nic}, $opt{uuid}, $opt{project_id});
+my (
+    $drive,
+    $mac,
+    $ip,
+    $mask,
+    $gw,
+    $hostname,
+    $nic,
+    $uuid,
+    $project_id
+  )
+  = (
+      $opt{drive},
+      $opt{mac},
+      $opt{ip},
+      $opt{mask},
+      $opt{gw},
+      $opt{hostname},
+      $opt{nic},
+      $opt{uuid},
+      $opt{project_id}
+    );
 
 my $h = Sys::Guestfs->new;
 $h->set_trace(1) if $debug;
