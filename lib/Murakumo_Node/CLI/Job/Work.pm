@@ -20,6 +20,7 @@ our %works;
 our $config = Murakumo_Node::CLI::Utils->new->config;
 our $default_callback_uri = $config->{job_callback_uri};
 
+sub max_retries { 0 }
 
 BEGIN {
   {

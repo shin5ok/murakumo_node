@@ -24,12 +24,6 @@ Catalyst Controller.
 use Data::Dumper;
 use JSON;
 
-sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->response->body('Matched Murakumo_Node::Controller::Node in Node.');
-}
-
 sub setup_node :Local {
   my ($self, $c) = @_;
 

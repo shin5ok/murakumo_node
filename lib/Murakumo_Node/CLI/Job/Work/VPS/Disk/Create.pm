@@ -16,7 +16,6 @@ sub work {
 
   # 引数をコピー
   my %args = %{$job->arg};
-  delete $args{job_uuid};
 
   local $@;
   eval {

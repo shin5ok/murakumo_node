@@ -28,12 +28,6 @@ use JSON;
 use URI::Escape;
 use Murakumo_Node::CLI::Utils;
 
-sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->response->body('Matched Murakumo_Node::Controller::VPS in VPS.');
-}
-
 sub boot :Local {
   my ( $self, $c ) = @_;
   return $c->forward( 'boot_from_json' );

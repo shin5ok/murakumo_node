@@ -8,10 +8,13 @@ use URI;
 use Catalyst::Test 'Murakumo_Node';
 use Murakumo_Node::Controller::Node;
 
-SKIP: {
-  subtest "api /node/setup_node" => sub {
-    ok 1;
-  };
-}
+subtest "api /check" => sub {
+
+  my ($r, $c) = ctx_request("/check");
+
+  diag $r->content;
+  ok($r->is_success);
+
+};
 
 done_testing();

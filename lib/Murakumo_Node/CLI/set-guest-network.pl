@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 # packageで提供されているperlを利用します
+# なので、標準モジュール以外はなるべく使わない方針で
+
 use warnings;
 use strict;
 use Sys::Guestfs;
