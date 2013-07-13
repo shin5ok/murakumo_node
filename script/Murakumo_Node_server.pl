@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/env murakumo-perl
 
 BEGIN {
     $ENV{CATALYST_SCRIPT_GEN} = 40;
