@@ -15,7 +15,7 @@ our $script = "/usr/local/bin/set-guest-network.pl";
 sub new {
   my $class       = shift;
   my $script_path = shift;
-  $script_path ||= $script;
+  $script_path  //= $script;
 
   my $obj = bless {}, $class;
   $obj->{script} = $script_path;
@@ -57,18 +57,18 @@ sub set_network {
 
   logging $command;
 
-  my $r = IPC::Cmd::run(
-            command => $command,
-            verbose => 1,
-            timeout => 50,
-          );
+  my @results = IPC::Cmd::run(
+                               command => $command,
+                               verbose => 1,
+                               timeout => 50,
+                             );
 
-  if ($r) {
+  if ($results[0]) {
     logging "set_network ok";
     return 1;
 
   } else {
-    logging "set_network NG";
+    logging "set_network NG($results[4])";
     return 0;
 
   }

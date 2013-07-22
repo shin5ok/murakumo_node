@@ -4,6 +4,8 @@ use 5.014;
 
 package Murakumo_Node::CLI::Libvirt::Storage 0.03;
 
+# 将来的にはプラグイン化して、複数のストレージを簡単に扱いたい
+
 use FindBin;
 use Carp;
 use Data::Dumper;
