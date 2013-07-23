@@ -71,6 +71,16 @@ sub make_br_and_vlan {
     }
 
     # upしてるのを確認するために、ip link show コマンドの出力から判断・・・カッコよくない
+    my ($org_nic) = $vlan_nic =~ m{(eth\d+)};
+    if ($ip_link !~ /$org_nic\sstate\s+UP/) {
+      my $command = "/sbin/ifconfig $org_nic up";
+      my $r = command( $command );
+      if (! $r) {
+        croak "*** fail command( $command )";
+      }
+      sleep 1;
+    }
+
     if ($ip_link !~ /$vlan_nic\@[^\n]+state\s+UP/) {
       my $command = "/sbin/ifconfig $vlan_nic up";
       my $r = command( $command );
