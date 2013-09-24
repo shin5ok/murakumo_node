@@ -27,6 +27,7 @@ BEGIN {
     no warnings 'redefine';
 
     $SIG{TERM} = $SIG{INT} = sub {
+      logging sprintf "%s : worker(%d) is exit", __PACKAGE__, $$;
       *TheSchwartz::work_once = sub { exit };
     };
 
