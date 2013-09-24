@@ -25,6 +25,11 @@ sub max_retries { 0 }
 BEGIN {
   {
     no warnings 'redefine';
+
+    $SIG{TERM} = $SIG{INT} = sub {
+      *TheSchwartz::work_once = sub { exit };
+    };
+
     use TheSchwartz::Job;
     my $org_job_completed = TheSchwartz::Job->can('completed');
     *TheSchwartz::Job::completed = sub {
