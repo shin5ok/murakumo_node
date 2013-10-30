@@ -58,6 +58,7 @@ sub run {
     max_workers  => $job_worker_number,
     trap_signals => {
                       TERM => 'TERM',
+                      INT  => 'TERM',
                       HUP  => 'TERM',
                     },
   );

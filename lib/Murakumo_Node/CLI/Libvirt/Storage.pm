@@ -62,6 +62,9 @@ sub add_by_path {
   my ($self, $storage_path) = @_;
   warn "storage_path : $storage_path" if is_debug;
 
+  $storage_path =~ m{^$config->{disk_path}/}
+    and return 1;
+
   # 先頭から、最初のuuidっぽい文字列を取得
   my ($storage_uuid) = $storage_path =~ m{ / (
                                              [0-9a-f]{8} \-
