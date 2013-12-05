@@ -167,14 +167,16 @@ sub _gathering_vps {
       my $name = $dom->get_name;
       my $xml  = XML::TreePP->new( force_array => 'disk' )->parse( $dom->get_xml_description );
 
-      my $vnc_port = 0;
+      my $vnc_port  = 0;
+      my $use_spice;
       my @disks;
       {
         no strict 'refs';
         if (exists $xml->{domain}->{devices}->{graphics}) {
-          if ($xml->{domain}->{devices}->{graphics}->{'-type'} eq q{vnc}) {
-            $vnc_port = $xml->{domain}->{devices}->{graphics}->{'-port'};
+          if ($xml->{domain}->{devices}->{graphics}->{'-type'} ne q{vnc}) {
+            $use_spice = 1;
           }
+          $vnc_port = $xml->{domain}->{devices}->{graphics}->{'-port'};
         }
 
         my @disk_infos = sort { $a->{address}->{'-bus'} cmp $b->{address}->{'-bus'} }
@@ -186,13 +188,14 @@ sub _gathering_vps {
       }
 
       my $tmp  = {
-        uuid     => $uuid,
-        name     => $name,
-        state    => $info->{state},
-        cpu      => $info->{nrVirtCpu},
-        memory   => $info->{memory},
-        vnc_port => $vnc_port,
-        disks    => join ',', @disks,
+        uuid      => $uuid,
+        name      => $name,
+        state     => $info->{state},
+        cpu       => $info->{nrVirtCpu},
+        memory    => $info->{memory},
+        vnc_port  => $vnc_port,
+        use_spice => 1,
+        disks     => join ',', @disks,
       };
 
       push @parameters, $tmp;

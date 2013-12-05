@@ -74,6 +74,7 @@ sub domain_obj {
 sub boot2 {
   my ($self, $args_ref) = @_;
 
+  warn Dumper $args_ref;
   my $result = 0;
 
   no strict 'refs';
@@ -83,7 +84,7 @@ sub boot2 {
   my $disk_cache    = $args_ref->{disk_cache};
   {
     my @require_keys = qw(
-      disks     
+      disks
       interfaces
       cpu_number
       memory
@@ -210,6 +211,7 @@ sub boot2 {
         cpu        => $vps_params->{cpu_number},
         clock      => $vps_params->{clock},
         cdrom_boot => $cdrom_boot,
+        use_spice  => $vps_params->{use_spice},
       };
 
       exists $vps_params->{cdrom_path}
