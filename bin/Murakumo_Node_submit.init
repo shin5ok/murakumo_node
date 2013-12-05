@@ -194,7 +194,7 @@ sub _gathering_vps {
         cpu       => $info->{nrVirtCpu},
         memory    => $info->{memory},
         vnc_port  => $vnc_port,
-        use_spice => 1,
+        use_spice => $use_spice,
         disks     => join ',', @disks,
       };
 

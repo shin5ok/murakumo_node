@@ -57,6 +57,9 @@ sub boot_from_json :Local {
 
     my $job_model = $c->model('Job');
     my $r = $job_model->register('VPS::Boot', $params);
+
+    $c->log->info("job register: boot" . Dumper $params);
+
     if ($r) {
       $c->stash->{result} = 1;
     } else {
