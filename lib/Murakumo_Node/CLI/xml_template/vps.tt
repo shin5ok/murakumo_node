@@ -53,6 +53,9 @@
     <input type="mouse" bus="ps2"/>
 [% IF use_spice -%]
     <graphics type="spice" autoport="yes" listen="0.0.0.0" keymap="ja" passwd="[% vnc_password -%]"/>
+    <controller type='virtio-serial' index='0'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
+    </controller>
 [% ELSE -%]
     <graphics type="vnc" port="-1" autoport="yes" listen="0.0.0.0" keymap="ja" passwd="[% vnc_password -%]"/>
 [% END -%]
