@@ -99,6 +99,7 @@ sub remove {
   require Murakumo_Node::CLI::Libvirt::Storage;
   my $libvirt_storage = Murakumo_Node::CLI::Libvirt::Storage->new;
   for my $disk_path ( @$disks ) {
+    logging "try to remove $disk_path";
 
     if (! $libvirt_storage->add_by_path( $disk_path )) {
       logging "add_by_path ( $disk_path ) failure";

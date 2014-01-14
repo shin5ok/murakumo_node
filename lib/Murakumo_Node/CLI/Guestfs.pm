@@ -68,7 +68,7 @@ sub set_network {
     return 1;
 
   } else {
-    logging "set_network NG($results[4])";
+    logging "set_network NG(Dumper $results[4])";
     return 0;
 
   }
