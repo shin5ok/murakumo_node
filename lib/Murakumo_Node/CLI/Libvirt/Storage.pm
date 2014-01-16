@@ -63,8 +63,10 @@ sub add_by_path {
   warn "storage_path : $storage_path" if is_debug;
 
   # ローカルのディスクパスだったら何もしないでtrueを返す
-  if ($storage_path =~ m{^$config->{disk_path}/}) {
-    return 1;
+  if (exists $config->{disk_path}) {
+    if ($storage_path =~ m{^$config->{disk_path}/}) {
+      return 1;
+    }
   }
 
   # 先頭から、最初のuuidっぽい文字列を取得
@@ -81,6 +83,7 @@ sub add_by_path {
     return 0;
   }
 
+  warn "try add $storage_path" if is_debug;
   return $self->add( $storage_uuid );
 
 }
