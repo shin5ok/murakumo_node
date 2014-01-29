@@ -178,7 +178,7 @@ sub mount_nfs_storage {
  }
  warn "mount: $mounted" if is_debug;
  if (! $mounted) {
-   logging "*** cannot confirm nfs mount($data->{uuid})";
+   croak "*** cannot confirm nfs mount($data->{uuid})";
  }
 
  return 1;
