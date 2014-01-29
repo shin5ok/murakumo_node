@@ -166,6 +166,21 @@ sub mount_nfs_storage {
  $result_ref->{exit_code} == 0
    or croak "*** nfs mount error($command)";
 
+ my $mounted = 0;
+ my $try_confirm_mount = 5;
+ _TRY_CONFIRM_MOUNT_:
+ while ($try_confirm_mount--) {
+   if ($self->is_mounted_storage( $data->{uuid} )) {
+     $mounted = 1;
+     last _TRY_CONFIRM_MOUNT_;
+   }
+   sleep 1;
+ }
+ warn "mount: $mounted" if is_debug;
+ if (! $mounted) {
+   logging "*** cannot confirm nfs mount($data->{uuid})";
+ }
+
  return 1;
 
 }
