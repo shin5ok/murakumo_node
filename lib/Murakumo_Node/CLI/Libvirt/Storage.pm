@@ -33,7 +33,7 @@ sub del {
   my $api_response = Murakumo_Node::CLI::Remote_JSON_API->new->get("/storage/info/", { uuid => $uuid });
   my $api_result   = decode_json $api_response->content;
 
-  if (! $self->umount_nfs_storage( $api_result->{data} )) {
+  if (! $self->umount_storage( $api_result->{data} )) {
     croak "*** umount error";
   } else {
     return 1;
@@ -110,7 +110,7 @@ sub add {
     # ディレクトリを作成
     -e $data->{mount_path} or mkpath $data->{mount_path}, { verbose => 1 };
 
-    $self->mount_nfs_storage( $data );
+    $self->mount_storage( $data );
     return 1;
 
   } else {
@@ -119,7 +119,7 @@ sub add {
 
 }
 
-sub mount_nfs_storage {
+sub mount_storage {
   my $self   = shift;
   my $data   = shift;
   my $umount = shift || 0;
@@ -145,11 +145,15 @@ sub mount_nfs_storage {
   my $command;
 
   if (not $umount) {
-    my $option  = $config->{nfs_mount_option}
+    my $option = "";
+    if ($data->{type} eq 'nfs') {
+      $option = $config->{nfs_mount_option}
                 ? "-o $config->{nfs_mount_option}"
                 : "";
+    }
 
-    $command = sprintf "/bin/mount %s %s:%s %s",
+    $command = sprintf "/bin/mount -t %s %s %s:%s %s",
+                          $data->{type},
                           $option,
                           $data->{host},
                           $data->{export_path},
@@ -164,7 +168,7 @@ sub mount_nfs_storage {
   my $result_ref = run_forked( $command, { timeout => 10 } );
 
  $result_ref->{exit_code} == 0
-   or croak "*** nfs mount error($command)";
+   or croak "*** mount error($command)";
 
  my $mounted = 0;
  my $try_confirm_mount = 5;
@@ -178,16 +182,16 @@ sub mount_nfs_storage {
  }
  warn "mount: $mounted" if is_debug;
  if (! $mounted) {
-   croak "*** cannot confirm nfs mount($data->{uuid})";
+   croak "*** cannot confirm mount($data->{uuid})";
  }
 
  return 1;
 
 }
 
-sub umount_nfs_storage {
+sub umount_storage {
   my ($self, $data) = @_;
-  $self->mount_nfs_storage( $data, 1 );
+  $self->mount_storage( $data, 1 );
 
 }
 
