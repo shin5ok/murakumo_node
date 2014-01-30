@@ -153,7 +153,7 @@ sub mount_storage {
     }
 
     $command = sprintf "/bin/mount -t %s %s %s:%s %s",
-                          $data->{type},
+                          lc $data->{type},
                           $option,
                           $data->{host},
                           $data->{export_path},
