@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use File::Find;
+use IPC::Cmd qw(run);
 use Carp;
 use opts;
 
@@ -44,8 +45,10 @@ sub cleanup {
       if ($test) {
         print $log, "\n";
       } else {
-        logging $log;
-        unlink $file;
+        my $removed = run( command => "rm -f $file", timeout => 30 );
+        if ($removed) {
+          logging $log;
+        }
       }
     }
   }
