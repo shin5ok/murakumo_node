@@ -210,6 +210,20 @@ my @write_files_content_array = (
               return $hostname;
             },
   },
+  {
+    file => "/etc/hosts",
+    code => sub {
+               open my $fh, "+<", "/etc/hosts";
+               my $content = "";
+               seek $fh, 0, 0;
+               $content .= $_ while (<$fh>);
+               close $fh;
+               $content .= "\n$ip  $hostname\n";
+               return $content;
+
+            },
+
+  },
 );
 
 my $failure = 0;
@@ -235,7 +249,6 @@ FILESYSTEMS: for my $dev ( keys %s ) {
           my $content;
           local $@;
           eval {
-            warn "+++++++ pre reading";
             $content = $h->read_file( $v->{file} );
           };
           if ($@ and ! $v->{force}) {
@@ -244,7 +257,6 @@ FILESYSTEMS: for my $dev ( keys %s ) {
             next __WRITE_FILES__;
           }
 
-            warn "+++++++ after reading";
           eval {
             my $func = $v->{code};
             my $new_content = $func->( $content, \%opt );
