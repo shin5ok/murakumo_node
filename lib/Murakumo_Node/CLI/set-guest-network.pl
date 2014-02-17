@@ -25,6 +25,7 @@ GetOptions(
 
 my $debug = exists $ENV{DEBUG};
 warn Dumper \@ARGV if $debug;
+our $os = qq{};
 
 for my $key ( qw( drive mac ip mask gw hostname ) ) {
   (exists $opt{$key} and $opt{$key})
@@ -68,7 +69,7 @@ $h->add_drive_opts ( $drive, format => 'raw', readonly => 0 );
 $h->launch;
 my %s = $h->list_filesystems;
 
-my $cfg_content = make_cfg_content();
+# my $cfg_content = make_cfg_content();
 
 # code の仕様
 # 引数
@@ -80,6 +81,8 @@ my @write_files_content_array = (
   {
     file    => "/etc/sysconfig/network",
     code    => sub {
+                 $os eq q{redhat} or return;
+
                  my ($content) = @_;
 
                  my $old_hostname = "";
@@ -108,8 +111,9 @@ my @write_files_content_array = (
     content => qq[{"uuid":"$uuid","project_id":"$project_id"}],
   },
   {
-    file    => "/etc/sysconfig/network-scripts/ifcfg-$nic",
-    content => make_cfg_content(),
+    file  => "/etc/sysconfig/network-scripts/ifcfg-$nic",
+    force => 1,
+    code  => \&make_cfg_content,
   },
   {
     file    => "/etc/udev/rules.d/70-persistent-cd.rules",
@@ -150,6 +154,7 @@ my @write_files_content_array = (
   {
     file    => "/etc/sysconfig/hwconf",
     code    => sub {
+                 $os eq q{redhat} or return;
                  my ($content) = @_;
                  my $new_mac = $mac;
                  $new_mac or return;
@@ -181,34 +186,76 @@ my @write_files_content_array = (
                  return $content;
                },
   },
+  {
+    file => "/etc/network/interfaces",
+    code => sub {
+              $os eq q{debian} or return;
+              my $content  = "";
+                 $content .= "auto lo\n";
+                 $content .= "iface lo inet loopback\n";
+                 $content .= "\n";
+                 $content .= "auto $nic\n";
+                 $content .= "iface $nic inet static\n";
+                 $content .= "         address $ip\n";
+                 $content .= "         netmask $mask\n";
+                 $content .= "         gateway $gw\n";
+
+                 return $content;
+
+            },
+  },
+  {
+    file => "/etc/hostname",
+    code => sub {
+              return $hostname;
+            },
+  },
 );
 
 my $failure = 0;
 FILESYSTEMS: for my $dev ( keys %s ) {
+  no strict 'refs';
 
   $s{$dev} =~ m|^ext[34]$| or next;
   $h->mount( $dev, '/' );
   if ($h->exists( '/etc' )) {
 
+    if (! $os) {
+      $os = is_redhat() ? "redhat" : is_debian() ? "debian" : "unknown";
+      warn sprintf "################## os type > %s ####################", $os;
+    }
+
     __WRITE_FILES__:
     for my $v ( @write_files_content_array ) {
-      if ( exists $v->{content} ) {
+      if ( exists $v->{content} and defined $v->{content} ) {
         $h->write( $v->{file}, $v->{content} );
       }
       elsif ( exists $v->{code} ) {
-        if ( $h->exists( $v->{file} )) {
+        if ( $h->exists( $v->{file} ) or $v->{force} ) {
           my $content;
           local $@;
           eval {
+            warn "+++++++ pre reading";
             $content = $h->read_file( $v->{file} );
+          };
+          if ($@ and ! $v->{force}) {
+            $failure = 1;
+            warn "exception: $@";
+            next __WRITE_FILES__;
+          }
+
+            warn "+++++++ after reading";
+          eval {
             my $func = $v->{code};
             my $new_content = $func->( $content, \%opt );
             if ($new_content) {
+              warn $new_content if $debug;
               $h->write( $v->{file}, $new_content );
             }
           };
           if ($@) {
             $failure = 1;
+            warn "exception: $@";
             next __WRITE_FILES__;
           }
         }
@@ -233,6 +280,7 @@ if ($failure) {
 }
 
 sub make_network_content {
+  $os eq q{redhat} or return;
   no strict 'refs';
   my $ref      = shift;
   my $hostname = $ref->{hostname};
@@ -251,6 +299,9 @@ __EOD__
 }
 
 sub make_cfg_content {
+  warn "################# make_cfg_content start";
+  $os eq q{redhat} or return;
+  warn "################# make_cfg_content run";
   my $_x = << "__EOD__";
 DEVICE=$nic
 IPADDR=$ip
@@ -262,3 +313,17 @@ __EOD__
 
   return $_x;
 }
+
+sub is_redhat {
+  $h->exists("/etc/redhat-release")
+  and
+  $h->exists("/etc/sysconfig/network-scripts");
+
+}
+
+sub is_debian {
+  $h->exists("/etc/networks")
+  and
+  $h->exists("/etc/network/interfaces");
+}
+
