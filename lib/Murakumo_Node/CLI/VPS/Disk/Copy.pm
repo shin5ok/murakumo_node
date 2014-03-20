@@ -67,6 +67,10 @@ sub find_stock_image_and_copy {
 
   my $copy_command = sprintf "/bin/cp --sparse=auto -n %s %s", $self->src, $self->dst;
   logging $copy_command;
+  if (-e $self->dst) {
+    croak "*** copy destination file has already exist";
+  }
+
   my @copied = run ( command => $copy_command );
   if (! $copied[0]) {
     logging $copied[2];
