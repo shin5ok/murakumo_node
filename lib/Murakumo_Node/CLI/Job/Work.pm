@@ -150,9 +150,11 @@ sub _job_lock {
     if (-e $lock_path) {
       croak "another job $job_uuid is running...";
     } else {
+      logging "create lock $lock_path";
       open my $fh, ">", $lock_path;
     }
   } else {
+    logging "delete lock $lock_path";
     unlink $lock_path;
   }
 }
