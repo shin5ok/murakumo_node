@@ -19,8 +19,10 @@ our $class_dir_path = sprintf "%s::", __PACKAGE__;
 our %works;
 our $config = Murakumo_Node::CLI::Utils->new->config;
 our $default_callback_uri = $config->{job_callback_uri};
+our $lock_dir = "/var/tmp";
 
 sub max_retries { 0 }
+sub grab_for { 60 * 60 * 24 } # 1 day
 
 BEGIN {
   {
@@ -39,6 +41,8 @@ BEGIN {
       my $message      = @args > 0 ? $args[0] : "";
       my $callback_uri = $self->arg->{callback_uri};
       $callback_uri ||= $default_callback_uri;
+
+      _job_lock( $job_uuid, 0 );
 
       # my ($self, $job_uuid, $message, $callback_uri) = @_;
       # 第2引数の 1 は成功(job.result列)
@@ -59,6 +63,8 @@ BEGIN {
       my $message      = @args > 0 ? $args[0] : "";
       my $callback_uri = $self->arg->{callback_uri};
       $callback_uri ||= $default_callback_uri;
+
+      _job_lock( $job_uuid, 0 );
 
       # my ($self, $job_uuid, $message, $callback_uri) = @_;
       # 第2引数の 1 は失敗(job.result列)
@@ -135,12 +141,31 @@ sub _end_of_job {
   return 0;
 }
 
+sub _job_lock {
+  my $job_uuid = shift;
+  my $mode     = shift;
+  my $lock_path = "$lock_dir/$job_uuid";
+  if ($mode) {
+    # try to lock
+    if (-e $lock_path) {
+      croak "another job $job_uuid is running...";
+    } else {
+      open my $fh, ">", $lock_path;
+    }
+  } else {
+    unlink $lock_path;
+  }
+}
+
 sub work_simple {
   my ($self, $job) = @_;
   our %works;
   our $class_dir_path;
   my $job_class_name = $job->arg->{_worker_class};
   my $worker_class = $class_dir_path . $job_class_name;
+  if (my $job_uuid = $job->arg->{job_uuid}) {
+    _job_lock( $job_uuid, 1 );
+  }
   warn "=========== goto >>> ${worker_class}::work =============";
   eval qq{ use $worker_class };
   goto \&{ $worker_class . "::work" };
