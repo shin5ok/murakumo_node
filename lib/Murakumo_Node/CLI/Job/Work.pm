@@ -19,7 +19,7 @@ our $class_dir_path = sprintf "%s::", __PACKAGE__;
 our %works;
 our $config = Murakumo_Node::CLI::Utils->new->config;
 our $default_callback_uri = $config->{job_callback_uri};
-our $lock_dir = "/var/tmp";
+our $lock_dir = "/var/tmp/" . __PACKAGE__;
 
 sub max_retries { 0 }
 sub grab_for { 60 * 60 * 24 } # 1 day
@@ -144,6 +144,10 @@ sub _end_of_job {
 sub _job_lock {
   my $job_uuid = shift;
   my $mode     = shift;
+  if (! -d $lock_dir) {
+    require File::Path;
+    File::Path::make_path( $lock_dir, { mode => 0700 } );
+  }
   my $lock_path = "$lock_dir/$job_uuid";
   if ($mode) {
     # try to lock
