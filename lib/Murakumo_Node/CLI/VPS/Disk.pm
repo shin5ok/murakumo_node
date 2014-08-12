@@ -164,7 +164,11 @@ sub _disk_make {
                        timeout => 600,
                        verbose => 1,
                      );
-  return $disk_make;
+  if ( $disk_make and -e $file_path ) {
+    return 1;
+  } else {
+    croak "*** disk image $file_path create failure";
+  }
 }
 
 sub clone {
